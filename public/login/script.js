@@ -78,7 +78,7 @@ class EcoWellnessLoginForm {
         const login = this.loginInput.value.trim();
         
         if (!login) {
-            this.showError('login', 'Email / Username / NIM tidak boleh kosong');
+            this.showError('login', 'Email / Username tidak boleh kosong');
             return false;
         }
         

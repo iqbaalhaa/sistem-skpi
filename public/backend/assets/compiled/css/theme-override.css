@@ -1,0 +1,62 @@
+/* Override primary colors */
+:root {
+    --bs-primary: #1172bc !important;
+    --bs-primary-rgb: 17, 114, 188 !important;
+}
+
+.btn-primary {
+    background-color: #1172bc !important;
+    border-color: #1172bc !important;
+}
+
+.btn-primary:hover {
+    background-color: #0e5b96 !important;
+    border-color: #0e5b96 !important;
+}
+
+.text-primary {
+    color: #1172bc !important;
+}
+
+.bg-primary {
+    background-color: #1172bc !important;
+}
+
+/* Links */
+a {
+    color: #1172bc;
+}
+
+a:hover {
+    color: #0e5b96;
+}
+
+/* Sidebar */
+#sidebar .sidebar-header {
+}
+
+.sidebar-wrapper .menu .sidebar-item.active > .sidebar-link {
+    background-color: #1172bc !important;
+}
+
+/* Buttons and other primary-colored elements */
+.btn-outline-primary {
+    color: #1172bc !important;
+    border-color: #1172bc !important;
+}
+
+.btn-outline-primary:hover {
+    background-color: #1172bc !important;
+    color: #fff !important;
+}
+
+/* Active states */
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+    background-color: #1172bc !important;
+}
+
+/* Progress bars */
+.progress-bar {
+    background-color: #ffc107 !important;
+}

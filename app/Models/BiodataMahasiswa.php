@@ -12,7 +12,7 @@ class BiodataMahasiswa extends Model
     protected $table = 'biodata_mahasiswa';
 
     protected $fillable = [
-        'user_id', 'nim', 'nama', 'prodi_id', 'tempat_lahir', 'tanggal_lahir', 'alamat', 'no_hp'
+        'user_id', 'nim', 'nama', 'prodi_id', 'tempat_lahir', 'tanggal_lahir', 'alamat', 'no_hp', 'foto'
     ];
 
     public function prodi()

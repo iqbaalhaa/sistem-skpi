@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -81,5 +84,45 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
 
         return redirect('/');
+    }
+
+    // Tampilkan halaman register
+    public function showRegister()
+    {
+        return view('auth.register');
+    }
+
+    // Proses registrasi
+    public function register(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'username' => 'required|string|unique:users,username|min:3|max:255',
+                'email' => 'required|string|email|unique:users,email|max:255',
+                'password' => 'required|string|min:8|confirmed',
+            ]);
+
+            Log::info('Validation passed', $validated);
+
+            $user = User::create([
+                'username' => $request->username,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'role' => 'mahasiswa', // Set default role to mahasiswa
+            ]);
+
+            Log::info('User created', ['user_id' => $user->id]);
+
+            Auth::login($user);
+            Log::info('User logged in');
+
+            return redirect()->route('mahasiswa.dashboard');
+        } catch (\Exception $e) {
+            Log::error('Registration failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return back()->withInput()->withErrors(['error' => 'Terjadi kesalahan saat mendaftar. ' . $e->getMessage()]);
+        }
     }
 }

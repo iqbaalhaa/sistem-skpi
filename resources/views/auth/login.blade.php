@@ -6,6 +6,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Informasi SKPI | Login</title>
     <link rel="stylesheet" href="{{ asset('login/style.css') }}">
+    <style>
+        body {
+            min-height: 100vh;
+            overflow-y: auto;
+        }
+        .login-container {
+            min-height: 100vh;
+            padding: 1.5rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .wellness-card {
+            max-height: 85vh;
+            overflow-y: auto;
+            margin: auto;
+            padding: 1.5rem;
+            width: 90%;
+            max-width: 400px;
+        }
+        .wellness-card::-webkit-scrollbar {
+            width: 0;
+            background: transparent;
+        }
+        .wellness-card {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .harmony-form {
+            overflow-y: visible;
+            gap: 1rem;
+        }
+        .organic-field {
+            margin-bottom: 0.75rem;
+        }
+        .mindful-header {
+            margin-bottom: 1rem;
+        }
+        .mindful-header h1 {
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+        }
+        .mindful-header p {
+            font-size: 0.9rem;
+        }
+        @media (max-height: 800px) {
+            .wellness-card {
+                margin: 1rem auto;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -30,8 +81,8 @@
                     </svg>
                     <div class="zen-glow"></div>
                 </div> -->
-                <h1>Sistem Informasi</h1>
-                <p>Surat Keterangan Pendamping Ijazah</p>
+                <h1>LOGIN</h1>
+                <p>Sistem Informasi Surat Keterangan Pendamping Ijazah</p>
             </div>
 
             <form class="harmony-form" id="loginForm" method="POST" action="{{ route('login.post') }}" novalidate>
@@ -86,7 +137,10 @@
                         </span>
                         <span class="checkbox-text">Keep me centered</span>
                     </label> -->
-                    <a href="#" class="healing-link">Lupa Password?</a>
+                    <div style="display: flex; justify-content: space-between; width: 100%;">
+                        <a href="#" class="healing-link">Lupa Password?</a>
+                        <a href="{{ route('register') }}" class="healing-link">Daftar disini</a>
+                    </div>
                 </div>
 
                 <button type="submit" class="harmony-button">

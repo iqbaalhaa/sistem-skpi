@@ -10,6 +10,8 @@
   <link rel="stylesheet" href="{{ asset('backend/assets/compiled/css/app.css') }}">
   <link rel="stylesheet" href="{{ asset('backend/assets/compiled/css/app-dark.css') }}">
   <link rel="stylesheet" href="{{ asset('backend/assets/compiled/css/iconly.css') }}">
+  <!-- Theme Override - Must be last -->
+  <link rel="stylesheet" href="{{ asset('backend/assets/compiled/css/theme-override.css') }}">
 </head>
 
 <body>
@@ -28,8 +30,19 @@
         <div class="d-flex justify-content-between align-items-center">
           <div></div>
           <div class="d-flex align-items-center">
-            <span class="me-3">Selamat datang, {{ Auth::user()->username }} ({{ ucfirst(str_replace('_', ' ', Auth::user()->role)) }})</span>
-            <a href="{{ route('logout') }}" class="btn btn-outline-danger btn-sm">
+            @if(Auth::user()->biodataMahasiswa)
+              <img src="{{ asset('storage/foto_mahasiswa/' . Auth::user()->biodataMahasiswa->foto) }}" alt="Foto Profil" style="width: 45px; height: 45px; object-fit: cover; border-radius: 50%;">
+            @endif
+            <div class="ms-3">
+              @if(Auth::user()->role == 'mahasiswa')
+                <h6 class="mb-0">{{ Auth::user()->biodataMahasiswa?->nama ?? Auth::user()->username }}</h6>
+                <p class="mb-0 text-muted small">{{ Auth::user()->biodataMahasiswa?->nim ?? '-' }}</p>
+              @else
+                <h6 class="mb-0">{{ Auth::user()->username }}</h6>
+                <p class="mb-0 text-muted small">{{ ucfirst(str_replace('_', ' ', Auth::user()->role)) }}</p>
+              @endif
+            </div>
+            <a href="{{ route('logout') }}" class="btn btn-outline-danger btn-sm ms-3">
               <i class="bi bi-box-arrow-right"></i> Logout
             </a>
           </div>

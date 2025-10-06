@@ -50,9 +50,9 @@
             <nav id="navbar" class="navbar">
                 <ul>
                     <li><a href="{{ url('/') }}" class="active">Home</a></li>
-                    <li><a href="about.html">Tentang</a></li>
+                    <li><a href="#get-started">Tentang</a></li>
                     <li><a href="#">Panduan</a></li>
-                    <li><a href="#">Hubungi Kami</a></li>
+                    <li><a href="#footer">Hubungi Kami</a></li>
                 </ul>
             </nav><!-- .navbar -->
 
@@ -69,6 +69,7 @@
                         <h2 data-aos="fade-down">Sistem Informasi <span>Surat Keterangan Pendamping Ijazah</span></h2>
                         <p data-aos="fade-up">Selamat Datang di Sistem Informasi Surat Keterangan Pendamping Ijazah</p>
                         <a data-aos="fade-up" data-aos-delay="200" href="{{ route('login') }}" class="btn-get-started">Login</a>
+                        <a data-aos="fade-up" data-aos-delay="200" href="{{ route('register') }}" class="btn-get-started">Register</a>
                     </div>
                 </div>
             </div>
@@ -108,15 +109,23 @@
 
                     <div class="col-lg-6 d-flex align-items-center" data-aos="fade-up">
                         <div class="content">
-                            <h3>Minus hic non reiciendis ea possimus at quia.</h3>
-                            <p>Rem id rerum. Debitis deserunt quidem delectus expedita ducimus dolor. Aut iusto ipsa.
-                                Eos ipsum nobis
-                                ipsa soluta itaque perspiciatis fuga ipsum perspiciatis. Eum amet fugiat totam nisi
-                                possimus ut delectus
-                                dicta.
-                            <p>Aliquam velit deserunt autem. Inventore et saepe. Tenetur suscipit eligendi labore culpa
-                                eos. Deserunt
-                                porro magni qui necessitatibus dolorem at animi cupiditate.</p>
+                            <h3>Tentang SKPI SAINTEK</h3>
+                            <p>SKPI (Surat Keterangan Pendamping Ijazah) merupakan dokumen resmi yang melengkapi ijazah 
+                               dan transkrip akademik, memberikan informasi tentang pencapaian akademik dan non-akademik,
+                               kompetensi kerja, serta kualifikasi pemegang ijazah.</p>
+                            <p>Sistem ini memudahkan mahasiswa Fakultas Sains dan Teknologi untuk mengajukan dan mengelola
+                               SKPI mereka secara efisien dan terstruktur.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6" data-aos="fade-up">
+                        <div class="ratio ratio-16x9">
+                            <iframe src="https://www.youtube-nocookie.com/embed/QX7VVr9YlcE"
+                                    title="Tentang SKPI SAINTEK" 
+                                    frameborder="0" 
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                    allowfullscreen>
+                            </iframe>
                         </div>
                     </div>
 
@@ -239,6 +248,21 @@
     <!-- Template Main JS File -->
     <script src="{{ asset('frontend/assets/js/main.js') }}"></script>
 
+    <!-- Smooth Scroll -->
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
 
 </body>
 

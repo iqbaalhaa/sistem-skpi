@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Mahasiswa\PenghargaanPrestasiController;
 use App\Http\Controllers\Mahasiswa\FormSkpiController;
+use Illuminate\Support\Facades\Log;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,6 +28,8 @@ Route::prefix('auth')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->name('login.post');
     Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
+    Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
+    Route::post('/register', [AuthController::class, 'register'])->name('register.post');
 });
 
 // Dashboard routes
@@ -73,14 +76,41 @@ Route::put('/mahasiswa/biodata', [App\Http\Controllers\Mahasiswa\BiodataControll
 Route::middleware(['auth', 'role:admin_prodi'])->group(function () {
     Route::get('/prodi/verifikasi', function () {
         // Eager load biodataMahasiswa dan pengajuanSkpi
-        $mahasiswas = \App\Models\User::where('role', 'mahasiswa')
+        // Debug: tampilkan prodi_id admin
+        $adminProdiId = auth()->user()->prodi_id;
+        Log::info('Admin prodi_id: ' . $adminProdiId);
+
+        if (!$adminProdiId) {
+            Log::warning('Admin tidak memiliki prodi_id yang valid');
+            return redirect()->back()->with('error', 'Anda belum ditugaskan ke prodi manapun. Silahkan hubungi admin fakultas.');
+        }
+
+        // Query mahasiswa
+        $mahasiswasQuery = \App\Models\User::where('role', 'mahasiswa');
+        
+        // Debug: tampilkan jumlah total mahasiswa sebelum filter
+        Log::info('Total mahasiswa: ' . $mahasiswasQuery->count());
+        
+        // Tambahkan filter prodi
+        $mahasiswas = $mahasiswasQuery
+            ->where('prodi_id', $adminProdiId)
             ->with(['biodataMahasiswa', 'pengajuanSkpi', 'prestasi', 'organisasi', 'kompetensiBahasa', 'magang', 'kompetensiKeagamaan'])
             ->get();
+            
+        // Debug: tampilkan jumlah mahasiswa setelah filter dan dump query
+        Log::info('Mahasiswa dengan prodi_id ' . $adminProdiId . ': ' . $mahasiswas->count());
+        Log::info('SQL Query: ' . $mahasiswasQuery->toSql());
+        Log::info('Query Bindings: ' . json_encode($mahasiswasQuery->getBindings()));
+        
         return view('admin.prodi.verifikasi', compact('mahasiswas'));
     })->name('prodi.verifikasi');
     
     Route::post('/prodi/verifikasi/{id}', [\App\Http\Controllers\Admin\VerifikasiController::class, 'verifikasi'])
         ->name('prodi.verifikasi.aksi');
+
+    // Terima seluruh SKPI mahasiswa (jika semua komponen sudah disetujui)
+    Route::post('/prodi/terima-mahasiswa/{userId}', [\App\Http\Controllers\Admin\VerifikasiController::class, 'terimaMahasiswa'])
+        ->name('prodi.verifikasi.terimaMahasiswa');
 
     // Routes untuk kelola mahasiswa
     Route::resource('prodi/mahasiswa', \App\Http\Controllers\MahasiswaProdiController::class)

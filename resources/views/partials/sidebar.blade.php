@@ -3,9 +3,7 @@
         <div class="sidebar-header position-relative">
             <div class="d-flex justify-content-between align-items-center">
                 <div class="logo">
-                    <a href="{{ url('admin/dashboard') }}" class="text-decoration-none">
-                        <span class="fw-bold fs-5" style="color: #1172bc;">SKPI</span>
-                    </a>
+                    <a href="{{ url('/') }}"><img src="{{ asset('backend/assets/static/images/logo/logo.png') }}" alt="Logo" srcset=""></a>
                 </div>
                 <div class="theme-toggle d-flex gap-2  align-items-center mt-2">
                     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -62,8 +60,8 @@
                         <li class="sidebar-title">Akun</li>
                         <li class="sidebar-item {{ request()->routeIs('mahasiswa.biodata') ? 'active' : '' }}">
                             <a href="{{ route('mahasiswa.biodata') }}" class="sidebar-link">
-                                <i class="bi bi-gear-fill"></i>
-                                <span>Pengaturan Akun</span>
+                                <i class="bi bi-person-fill"></i>
+                                <span>Profil</span>
                             </a>
                         </li>
                     @elseif(Auth::user()->role === 'admin_prodi')
@@ -113,7 +111,7 @@
                         <li class="sidebar-item {{ request()->routeIs('admin.fakultas.manajemenuser.*') ? 'active' : '' }}">
                             <a href="{{ route('admin.fakultas.manajemenuser.index') }}" class="sidebar-link">
                                 <i class="bi bi-people-fill"></i>
-                                <span>Manajemen Admin Prodi</span>
+                                <span>Manajemen Admin</span>
                             </a>
                         </li>
                         <li class="sidebar-item">
@@ -123,12 +121,6 @@
                             </a>
                         </li>
                     @endif
-                    <li class="sidebar-item">
-                        <a href="{{ route('logout') }}" class="sidebar-link">
-                            <i class="bi bi-box-arrow-right"></i>
-                            <span>Logout</span>
-                        </a>
-                    </li>
                 @endif
             </ul>
         </div>

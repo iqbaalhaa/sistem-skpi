@@ -67,6 +67,7 @@ class BiodataController extends Controller
         $biodata->tanggal_lahir = $request->tanggal_lahir;
         $biodata->alamat = $request->alamat;
         $biodata->no_hp = $request->no_hp;
+        $biodata->tahun_masuk = $request->tahun_masuk;
         $biodata->user_id = $user->id;
 
         // Handle upload foto

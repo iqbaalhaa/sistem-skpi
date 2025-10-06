@@ -3,13 +3,13 @@
 @section('title', 'Biodata Mahasiswa')
 
 @section('content')
-<div class="container mt-4">
+<div class="container mt-5">
     <h1 class="mb-4">Biodata Mahasiswa</h1>
     <div class="card shadow">
         <div class="card-body">
             <div class="row align-items-center">
                 <div class="col-md-3 text-center mb-3 mb-md-0">
-                    <img src="{{ $biodata->foto ? asset('storage/foto_mahasiswa/' . $biodata->foto) : asset('images/default-user.png') }}" alt="Foto Mahasiswa" class="img-thumbnail rounded-circle" style="width: 160px; height: 160px; object-fit: cover;">
+                    <img src="{{ isset($biodata) && $biodata->foto ? asset('storage/foto_mahasiswa/' . $biodata->foto) : asset('images/default-user.png') }}" alt="Foto Mahasiswa" class="img-thumbnail rounded-circle" style="width: 160px; height: 160px; object-fit: cover;">
                     <br>
                     <button type="button" class="btn btn-outline-primary btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#modalEditBiodata">Edit</button>
                 </div>
@@ -38,6 +38,10 @@
                         <div class="col-sm-4 fw-bold">No. HP</div>
                         <div class="col-sm-8">{{ $biodata->no_hp ?? '-' }}</div>
                     </div>
+                    <div class="row mb-2">
+                        <div class="col-sm-4 fw-bold">Tahun Masuk</div>
+                        <div class="col-sm-8">{{ $biodata->tahun_masuk ?? '-' }}</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -56,7 +60,7 @@
             @method('PUT')
             <div class="modal-body">
                 <div class="mb-3 text-center">
-                    <img src="{{ $biodata->foto ? asset('storage/foto_mahasiswa/' . $biodata->foto) : asset('images/default-user.png') }}" alt="Foto Mahasiswa" class="img-thumbnail rounded-circle mb-2" style="width: 120px; height: 120px; object-fit: cover;">
+                    <img src="{{ isset($biodata) && $biodata->foto ? asset('storage/foto_mahasiswa/' . $biodata->foto) : asset('images/default-user.png') }}" alt="Foto Mahasiswa" class="img-thumbnail rounded-circle mb-2" style="width: 120px; height: 120px; object-fit: cover;">
                     <input type="file" name="foto" class="form-control form-control-sm mt-2">
                 </div>
                 <div class="mb-3">
@@ -91,6 +95,10 @@
                 <div class="mb-3">
                     <label for="no_hp" class="form-label">No. HP</label>
                     <input type="text" name="no_hp" id="no_hp" class="form-control" value="{{ $biodata->no_hp ?? '' }}">
+                </div>
+                <div class="mb-3">
+                    <label for="tahun_masuk" class="form-label">Tahun Masuk</label>
+                    <input type="number" name="tahun_masuk" id="tahun_masuk" class="form-control" min="2000" max="2099" value="{{ $biodata->tahun_masuk ?? '' }}">
                 </div>
             </div>
             <div class="modal-footer">

@@ -4,8 +4,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Informasi SKPI | Login</title>
+    <title>Sistem Informasi SKPI | Register</title>
     <link rel="stylesheet" href="{{ asset('login/style.css') }}">
+    <style>
+        body {
+            min-height: 100vh;
+            overflow-y: auto;
+        }
+        .login-container {
+            min-height: 100vh;
+            padding: 1.5rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .wellness-card {
+            max-height: 85vh;
+            overflow-y: auto;
+            margin: auto;
+            padding: 1.5rem;
+            width: 90%;
+            max-width: 400px;
+        }
+        .wellness-card::-webkit-scrollbar {
+            width: 0;
+            background: transparent;
+        }
+        .wellness-card {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .harmony-form {
+            overflow-y: visible;
+            gap: 1rem;
+        }
+        .organic-field {
+            margin-bottom: 0.75rem;
+        }
+        .mindful-header {
+            margin-bottom: 1rem;
+        }
+        .mindful-header h1 {
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+        }
+        .mindful-header p {
+            font-size: 0.9rem;
+        }
+        @media (max-height: 800px) {
+            .wellness-card {
+                margin: 1rem auto;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -30,24 +81,43 @@
                     </svg>
                     <div class="zen-glow"></div>
                 </div> -->
-                <h1>Sistem Informasi</h1>
-                <p>Surat Keterangan Pendamping Ijazah</p>
+                <h1>REGISTER</h1>
+                <p>Sistem Informasi Surat Keterangan Pendamping Ijazah</p>
             </div>
 
-            <form class="harmony-form" id="loginForm" novalidate>
+            <form class="harmony-form" id="registerForm" method="POST" action="{{ route('register.post') }}" novalidate>
+                @csrf
                 <div class="organic-field">
                     <div class="field-nature"></div>
-                    <input type="text" id="email" name="email" required autocomplete="email">
-                    <label for="email">Nomor Induk Mahasiswa</label>
+                    <input type="text" id="username" name="username" value="{{ old('username') }}" required autocomplete="username">
+                    <label for="username">Username</label>
                     <div class="growth-indicator">
                         <div class="leaf-sprout"></div>
                     </div>
-                    <span class="gentle-error" id="emailError"></span>
+                    <span class="gentle-error" id="usernameError">
+                        @error('username')
+                            {{ $message }}
+                        @enderror
+                    </span>
                 </div>
 
                 <div class="organic-field">
                     <div class="field-nature"></div>
-                    <input type="password" id="password" name="password" required autocomplete="current-password">
+                    <input type="email" id="email" name="email" value="{{ old('email') }}" required autocomplete="email">
+                    <label for="email">Email</label>
+                    <div class="growth-indicator">
+                        <div class="leaf-sprout"></div>
+                    </div>
+                    <span class="gentle-error" id="emailError">
+                        @error('email')
+                            {{ $message }}
+                        @enderror
+                    </span>
+                </div>
+
+                <div class="organic-field">
+                    <div class="field-nature"></div>
+                    <input type="password" id="password" name="password" required autocomplete="new-password">
                     <label for="password">Password</label>
                     <button type="button" class="nature-toggle" id="passwordToggle"
                         aria-label="Toggle password visibility">
@@ -63,26 +133,42 @@
                                 stroke-linejoin="round" />
                         </svg>
                     </button>
-                    <span class="gentle-error" id="passwordError"></span>
+                    <span class="gentle-error" id="passwordError">
+                        @error('password')
+                            {{ $message }}
+                        @enderror
+                    </span>
+                </div>
+
+                <div class="organic-field">
+                    <div class="field-nature"></div>
+                    <input type="password" id="password_confirmation" name="password_confirmation" required autocomplete="new-password">
+                    <label for="password_confirmation">Konfirmasi Password</label>
+                    <button type="button" class="nature-toggle" id="confirmPasswordToggle"
+                        aria-label="Toggle password visibility">
+                        <svg class="eye-visible" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path
+                                d="M10 4c-4 0-7 3-8 6 1 3 4 6 8 6s7-3 8-6c-1-3-4-6-8-6zm0 10a4 4 0 110-8 4 4 0 010 8zm0-6a2 2 0 100 4 2 2 0 000-4z"
+                                fill="currentColor" />
+                        </svg>
+                        <svg class="eye-hidden" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path
+                                d="M3 3l14 14M8.5 8.5a2 2 0 002.83 2.83m-.83-4.83a4 4 0 014 4M10 6C6 6 3 9 2 12c.5 1.5 2 3.5 4 4.5M10 14c4 0 7-3 8-6-.5-1.5-2-3.5-4-4.5"
+                                stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                    </button>
                 </div>
 
                 <div class="mindful-options">
-                    <!-- <label class="zen-checkbox">
-                        <input type="checkbox" id="remember" name="remember">
-                        <span class="checkbox-leaf">
-                            <div class="leaf-shape"></div>
-                            <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-                                <path d="M1 4l2.5 2.5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </span>
-                        <span class="checkbox-text">Keep me centered</span>
-                    </label> -->
-                    <a href="#" class="healing-link">Lupa Password?</a>
+                    <div style="display: flex; justify-content: center; width: 100%;">
+                        <a href="{{ route('login') }}" class="healing-link">Sudah punya akun? Login disini</a>
+                    </div>
                 </div>
 
                 <button type="submit" class="harmony-button">
                     <div class="button-earth"></div>
-                    <span class="button-text">MASUK</span>
+                    <span class="button-text">DAFTAR</span>
                     <div class="button-growth">
                         <div class="growing-circle circle-1"></div>
                         <div class="growing-circle circle-2"></div>
@@ -147,8 +233,8 @@
         </div>
     </div>
 
-    <script src="../../shared/js/form-utils.js"></script>
-    <script src="script.js"></script>
+    <script src="{{ asset('login/shared/js/form-utils.js') }}"></script>
+    <script src="{{ asset('login/script.js') }}"></script>
 </body>
 
 </html>

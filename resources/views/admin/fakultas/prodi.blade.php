@@ -8,7 +8,7 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">Penghargaan/Prestasi</h4>
+                        <h4 class="card-title">Program Studi</h4>
                         <br>
                         <button type="button" class="btn btn-primary rounded-pill" data-bs-toggle="modal" data-bs-target="#modalTambahProdi">Tambah</button>
 
