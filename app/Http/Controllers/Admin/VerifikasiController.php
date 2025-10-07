@@ -41,7 +41,8 @@ class VerifikasiController extends Controller
                 ]);
             }
             
-            $mahasiswaProdiId = $item->user->prodi_id;
+            // Ambil prodi_id dari users.prodi_id, fallback ke biodata_mahasiswa.prodi_id jika null
+            $mahasiswaProdiId = $item->user->prodi_id ?? optional($item->user->biodataMahasiswa)->prodi_id;
 
             if ($mahasiswaProdiId != $adminProdiId) {
                 return response()->json([

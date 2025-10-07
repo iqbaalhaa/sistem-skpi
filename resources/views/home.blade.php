@@ -66,7 +66,7 @@
             <div class="container">
                 <div class="row justify-content-center">
                     <div class="col-lg-6 text-center">
-                        <h2 data-aos="fade-down">Sistem Informasi <span>Surat Keterangan Pendamping Ijazah</span></h2>
+                        <h2 data-aos="fade-down">Surat Keterangan Pendamping Ijazah</h2>
                         <p data-aos="fade-up">Selamat Datang di Sistem Informasi Surat Keterangan Pendamping Ijazah</p>
                         <a data-aos="fade-up" data-aos-delay="200" href="{{ route('login') }}" class="btn-get-started">Login</a>
                         <a data-aos="fade-up" data-aos-delay="200" href="{{ route('register') }}" class="btn-get-started">Register</a>

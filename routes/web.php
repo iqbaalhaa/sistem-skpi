@@ -85,17 +85,22 @@ Route::middleware(['auth', 'role:admin_prodi'])->group(function () {
             return redirect()->back()->with('error', 'Anda belum ditugaskan ke prodi manapun. Silahkan hubungi admin fakultas.');
         }
 
-        // Query mahasiswa
-        $mahasiswasQuery = \App\Models\User::where('role', 'mahasiswa');
-        
-        // Debug: tampilkan jumlah total mahasiswa sebelum filter
-        Log::info('Total mahasiswa: ' . $mahasiswasQuery->count());
-        
-        // Tambahkan filter prodi
+        // Query mahasiswa: filter berdasarkan prodi_id dari biodata_mahasiswa (fallback jika kolom users.prodi_id kosong)
+        $mahasiswasQuery = \App\Models\User::where('role', 'mahasiswa')
+            ->where(function($q) use ($adminProdiId) {
+                $q->where('prodi_id', $adminProdiId)
+                  ->orWhereHas('biodataMahasiswa', function($qb) use ($adminProdiId) {
+                      $qb->where('prodi_id', $adminProdiId);
+                  });
+            });
+
+        // Debug: tampilkan jumlah total mahasiswa sebelum dan sesudah filter
+        Log::info('Total mahasiswa (sebelum filter): ' . \App\Models\User::where('role', 'mahasiswa')->count());
+
         $mahasiswas = $mahasiswasQuery
-            ->where('prodi_id', $adminProdiId)
             ->with(['biodataMahasiswa', 'pengajuanSkpi', 'prestasi', 'organisasi', 'kompetensiBahasa', 'magang', 'kompetensiKeagamaan'])
             ->get();
+        Log::info('Mahasiswa (setelah filter by prodi via users/biodata): ' . $mahasiswas->count());
             
         // Debug: tampilkan jumlah mahasiswa setelah filter dan dump query
         Log::info('Mahasiswa dengan prodi_id ' . $adminProdiId . ': ' . $mahasiswas->count());
@@ -122,9 +127,17 @@ Route::middleware(['auth', 'role:admin_prodi'])->group(function () {
             'update' => 'prodi.mahasiswa.update',
             'destroy' => 'prodi.mahasiswa.destroy'
         ]);
+
+    // Generate SKPI
+    Route::get('/prodi/generate-skpi', [\App\Http\Controllers\Admin\GenerateSkpiController::class, 'index'])
+        ->name('prodi.generateskpi');
+    Route::post('/prodi/generate-skpi/{userId}', [\App\Http\Controllers\Admin\GenerateSkpiController::class, 'generate'])
+        ->name('prodi.generateskpi.generate');
 });
 
 Route::get('/mahasiswa/skpi', [FormSkpiController::class, 'index'])->name('mahasiswa.skpi');
+
+
 
 Route::post('/mahasiswa/penghargaan', [FormSkpiController::class, 'storePenghargaan'])->name('penghargaan.store');
 Route::post('/mahasiswa/organisasi', [FormSkpiController::class, 'storeOrganisasi'])->name('organisasi.store');

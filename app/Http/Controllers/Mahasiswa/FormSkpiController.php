@@ -22,7 +22,9 @@ class FormSkpiController extends Controller
                 'magang',
                 'kompetensiBahasa',
                 'kompetensiKeagamaan'
-            ])->get();
+            ])
+            ->where('user_id', Auth::id())
+            ->get();
 
             return view('mahasiswa.formskpi', compact('mahasiswa'));
         }
@@ -85,7 +87,7 @@ class FormSkpiController extends Controller
             return redirect()->back()->with('success', 'Data pengalaman organisasi berhasil ditambahkan.');
         }
 
-                public function updateOrganisasi(Request $request, $id)
+        public function updateOrganisasi(Request $request, $id)
         {
             $request->validate([
                 'organisasi' => 'required|string|max:255',
@@ -95,7 +97,9 @@ class FormSkpiController extends Controller
                 'catatan' => 'nullable|string',
             ]);
 
-            $organisasi = PengalamanOrganisasi::findOrFail($id);
+            $organisasi = PengalamanOrganisasi::where('id', $id)
+                ->where('user_id', Auth::id())
+                ->firstOrFail();
             $data = $request->only([
                 'organisasi',
                 'tahun_awal',
@@ -140,7 +144,7 @@ class FormSkpiController extends Controller
             return redirect()->back()->with('success', 'Data kompetensi bahasa berhasil ditambahkan.');
         }
 
-                public function updateKompetensiBahasa(Request $request, $id)
+        public function updateKompetensiBahasa(Request $request, $id)
         {
             $request->validate([
                 'nama_kompetensi' => 'required|string|max:255',
@@ -150,7 +154,9 @@ class FormSkpiController extends Controller
                 'catatan' => 'nullable|string',
             ]);
 
-            $bahasa = KompetensiBahasa::findOrFail($id);
+            $bahasa = KompetensiBahasa::where('id', $id)
+                ->where('user_id', Auth::id())
+                ->firstOrFail();
             $data = $request->only([
                 'nama_kompetensi',
                 'skor_kompetensi',
@@ -197,7 +203,7 @@ class FormSkpiController extends Controller
             return redirect()->back()->with('success', 'Data pengalaman magang berhasil ditambahkan.');
         }
 
-                public function updateMagang(Request $request, $id)
+        public function updateMagang(Request $request, $id)
         {
             $request->validate([
                 'keterangan_indonesia' => 'required|string|max:255',
@@ -208,7 +214,9 @@ class FormSkpiController extends Controller
                 'catatan' => 'nullable|string',
             ]);
 
-            $magang = PengalamanMagang::findOrFail($id);
+            $magang = PengalamanMagang::where('id', $id)
+                ->where('user_id', Auth::id())
+                ->firstOrFail();
             $data = $request->only([
                 'keterangan_indonesia',
                 'keterangan_inggris',
@@ -264,7 +272,9 @@ class FormSkpiController extends Controller
                 'catatan' => 'nullable|string',
             ]);
 
-            $keagamaan = KompetensiKeagamaan::findOrFail($id);
+            $keagamaan = KompetensiKeagamaan::where('id', $id)
+                ->where('user_id', Auth::id())
+                ->firstOrFail();
             $data = $request->only([
                 'keterangan_indonesia',
                 'keterangan_inggris',
@@ -283,7 +293,9 @@ class FormSkpiController extends Controller
 
         public function editPenghargaan($id)
         {
-            $penghargaan = PenghargaanPrestasi::findOrFail($id);
+            $penghargaan = PenghargaanPrestasi::where('id', $id)
+                ->where('user_id', Auth::id())
+                ->firstOrFail();
             return response()->json($penghargaan);
         }
 
@@ -298,7 +310,9 @@ class FormSkpiController extends Controller
                 'catatan' => 'nullable|string',
             ]);
 
-            $penghargaan = PenghargaanPrestasi::findOrFail($id);
+            $penghargaan = PenghargaanPrestasi::where('id', $id)
+                ->where('user_id', Auth::id())
+                ->firstOrFail();
             $data = $request->only([
                 'keterangan_indonesia',
                 'keterangan_inggris',
@@ -318,7 +332,9 @@ class FormSkpiController extends Controller
 
         public function destroyPenghargaan($id)
         {
-            $penghargaan = PenghargaanPrestasi::findOrFail($id);
+            $penghargaan = PenghargaanPrestasi::where('id', $id)
+                ->where('user_id', Auth::id())
+                ->firstOrFail();
             $penghargaan->delete();
             return redirect()->back()->with('success', 'Data penghargaan berhasil dihapus.');
         }

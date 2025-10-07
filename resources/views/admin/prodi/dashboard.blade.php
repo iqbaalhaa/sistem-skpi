@@ -135,7 +135,7 @@
                             <div class="text-xs fw-bold text-uppercase mb-1 opacity-75">
                                 SKPI Tervalidasi
                                 </div>
-                            <div class="h3 mb-0 fw-bold">{{ \App\Models\PengajuanSkpi::where('status', 'diverifikasi')->count() }}</div>
+                            <div class="h3 mb-0 fw-bold">{{ \App\Models\PengajuanSkpi::where('status', 'diterima_prodi')->count() }}</div>
                             <div class="text-xs opacity-75">
                                 <i class="bi bi-check-circle"></i> Selesai
                             </div>
@@ -258,7 +258,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse(\App\Models\PengajuanSkpi::with('biodataMahasiswa')->latest()->take(10)->get() as $pengajuan)
+                                @forelse(\App\Models\PengajuanSkpi::with('user.biodataMahasiswa')->latest()->take(10)->get() as $pengajuan)
                                 <tr>
                                     <td>
                                         <small class="text-muted">{{ $pengajuan->created_at->diffForHumans() }}</small>
@@ -266,11 +266,11 @@
                                     <td>
                                         <div class="d-flex align-items-center">
                                             <div class="avatar-sm bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
-                                                {{ substr($pengajuan->biodataMahasiswa->nama ?? 'N/A', 0, 1) }}
+                                                {{ substr($pengajuan->user->biodataMahasiswa->nama ?? 'N/A', 0, 1) }}
                                             </div>
                                             <div>
-                                                <div class="fw-bold">{{ $pengajuan->biodataMahasiswa->nama ?? 'N/A' }}</div>
-                                                <small class="text-muted">{{ $pengajuan->biodataMahasiswa->nim ?? 'N/A' }}</small>
+                                                <div class="fw-bold">{{ $pengajuan->user->biodataMahasiswa->nama ?? 'N/A' }}</div>
+                                                <small class="text-muted">{{ $pengajuan->user->biodataMahasiswa->nim ?? 'N/A' }}</small>
                                             </div>
                                         </div>
                                     </td>
@@ -284,7 +284,7 @@
                                             <span class="badge bg-warning">
                                                 <i class="bi bi-clock me-1"></i>Menunggu
                                             </span>
-                                        @elseif($pengajuan->status == 'diverifikasi')
+                                        @elseif($pengajuan->status == 'diterima_prodi')
                                             <span class="badge bg-success">
                                                 <i class="bi bi-check-circle me-1"></i>Selesai
                                             </span>
@@ -329,18 +329,18 @@
     const chartData = {
         labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
         tervalidasi: [
-            {{ \App\Models\PengajuanSkpi::where('status', 'diverifikasi')->whereMonth('created_at', 1)->count() }},
-            {{ \App\Models\PengajuanSkpi::where('status', 'diverifikasi')->whereMonth('created_at', 2)->count() }},
-            {{ \App\Models\PengajuanSkpi::where('status', 'diverifikasi')->whereMonth('created_at', 3)->count() }},
-            {{ \App\Models\PengajuanSkpi::where('status', 'diverifikasi')->whereMonth('created_at', 4)->count() }},
-            {{ \App\Models\PengajuanSkpi::where('status', 'diverifikasi')->whereMonth('created_at', 5)->count() }},
-            {{ \App\Models\PengajuanSkpi::where('status', 'diverifikasi')->whereMonth('created_at', 6)->count() }},
-            {{ \App\Models\PengajuanSkpi::where('status', 'diverifikasi')->whereMonth('created_at', 7)->count() }},
-            {{ \App\Models\PengajuanSkpi::where('status', 'diverifikasi')->whereMonth('created_at', 8)->count() }},
-            {{ \App\Models\PengajuanSkpi::where('status', 'diverifikasi')->whereMonth('created_at', 9)->count() }},
-            {{ \App\Models\PengajuanSkpi::where('status', 'diverifikasi')->whereMonth('created_at', 10)->count() }},
-            {{ \App\Models\PengajuanSkpi::where('status', 'diverifikasi')->whereMonth('created_at', 11)->count() }},
-            {{ \App\Models\PengajuanSkpi::where('status', 'diverifikasi')->whereMonth('created_at', 12)->count() }}
+            {{ \App\Models\PengajuanSkpi::where('status', 'diterima_prodi')->whereMonth('created_at', 1)->count() }},
+            {{ \App\Models\PengajuanSkpi::where('status', 'diterima_prodi')->whereMonth('created_at', 2)->count() }},
+            {{ \App\Models\PengajuanSkpi::where('status', 'diterima_prodi')->whereMonth('created_at', 3)->count() }},
+            {{ \App\Models\PengajuanSkpi::where('status', 'diterima_prodi')->whereMonth('created_at', 4)->count() }},
+            {{ \App\Models\PengajuanSkpi::where('status', 'diterima_prodi')->whereMonth('created_at', 5)->count() }},
+            {{ \App\Models\PengajuanSkpi::where('status', 'diterima_prodi')->whereMonth('created_at', 6)->count() }},
+            {{ \App\Models\PengajuanSkpi::where('status', 'diterima_prodi')->whereMonth('created_at', 7)->count() }},
+            {{ \App\Models\PengajuanSkpi::where('status', 'diterima_prodi')->whereMonth('created_at', 8)->count() }},
+            {{ \App\Models\PengajuanSkpi::where('status', 'diterima_prodi')->whereMonth('created_at', 9)->count() }},
+            {{ \App\Models\PengajuanSkpi::where('status', 'diterima_prodi')->whereMonth('created_at', 10)->count() }},
+            {{ \App\Models\PengajuanSkpi::where('status', 'diterima_prodi')->whereMonth('created_at', 11)->count() }},
+            {{ \App\Models\PengajuanSkpi::where('status', 'diterima_prodi')->whereMonth('created_at', 12)->count() }}
         ],
         menunggu: [
             {{ \App\Models\PengajuanSkpi::where('status', 'menunggu')->whereMonth('created_at', 1)->count() }},

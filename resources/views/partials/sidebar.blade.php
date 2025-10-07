@@ -83,6 +83,12 @@
                                 <span>Kelola Mahasiswa</span>
                             </a>
                         </li>
+                        <li class="sidebar-item {{ request()->routeIs('prodi.generateskpi') ? 'active' : '' }}">
+                            <a href="{{ route('prodi.generateskpi') }}" class="sidebar-link">
+                                <i class="bi bi-printer"></i>
+                                <span>Generate SKPI</span>
+                            </a>
+                        </li>
                         <li class="sidebar-item">
                             <a href="#" class="sidebar-link">
                                 <i class="bi bi-graph-up"></i>
