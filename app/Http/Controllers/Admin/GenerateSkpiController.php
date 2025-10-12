@@ -18,7 +18,9 @@ class GenerateSkpiController extends Controller
     {
         $adminProdiId = Auth::user()->prodi_id;
 
-        $mahasiswa = BiodataMahasiswa::with('user')
+        $mahasiswa = BiodataMahasiswa::with(['user.pengajuanSkpi' => function($query) {
+                $query->latest('created_at');
+            }])
             ->whereHas('user', function ($q) use ($adminProdiId) {
                 $q->where('role', 'mahasiswa')
                   ->where('prodi_id', $adminProdiId);

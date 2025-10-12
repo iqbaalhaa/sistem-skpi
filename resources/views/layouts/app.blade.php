@@ -4,12 +4,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>@yield('title', 'Dashboard -Admin Dashboard')</title>
 
   <link rel="shortcut icon" href="{{ asset('backend/assets/compiled/svg/favicon.svg') }}" type="image/x-icon">
   <link rel="stylesheet" href="{{ asset('backend/assets/compiled/css/app.css') }}">
   <link rel="stylesheet" href="{{ asset('backend/assets/compiled/css/app-dark.css') }}">
   <link rel="stylesheet" href="{{ asset('backend/assets/compiled/css/iconly.css') }}">
+  <!-- SweetAlert2 CSS -->
+  <link rel="stylesheet" href="{{ asset('backend/assets/extensions/sweetalert2/sweetalert2.min.css') }}">
   <!-- Theme Override - Must be last -->
   <link rel="stylesheet" href="{{ asset('backend/assets/compiled/css/theme-override.css') }}">
 
@@ -112,6 +115,8 @@
   <script src="{{ asset('backend/assets/extensions/simple-datatables/umd/simple-datatables.js') }}"></script>
   <script src="{{ asset('backend/assets/static/js/pages/simple-datatables.js') }}"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- SweetAlert2 JS -->
+  <script src="{{ asset('backend/assets/extensions/sweetalert2/sweetalert2.min.js') }}"></script>
   @stack('scripts')
 </body>
 </html>

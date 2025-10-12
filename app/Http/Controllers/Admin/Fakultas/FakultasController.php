@@ -48,17 +48,27 @@ class FakultasController extends Controller
  */
     public function tandaTangan(Request $request, $id): JsonResponse
     {
-        $skpi = PengajuanSkpi::findOrFail($id);
+        try {
+            $skpi = PengajuanSkpi::findOrFail($id);
 
-        if ($skpi->status !== 'diterima_prodi') {
-            return response()->json(['success' => false, 'message' => 'Hanya SKPI yang diterima prodi yang bisa ditandatangani.'], 422);
+            if ($skpi->status !== 'diterima_prodi') {
+                return response()->json(['success' => false, 'message' => 'Hanya SKPI yang diterima prodi yang bisa ditandatangani.'], 422);
+            }
+
+            $skpi->status = 'diterima_fakultas';
+            $skpi->tanggal_verifikasi_fakultas = now();
+            $skpi->save();
+
+            return response()->json(['success' => true, 'message' => 'SKPI berhasil ditandatangani fakultas.']);
+        } catch (\Exception $e) {
+            \Log::error('Error in tandaTangan method: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            
+            return response()->json([
+                'success' => false, 
+                'message' => 'Terjadi kesalahan server: ' . $e->getMessage()
+            ], 500);
         }
-
-        $skpi->status = 'ditandatangani_fakultas';
-        $skpi->tanggal_ttd_fakultas = now();
-        $skpi->save();
-
-        return response()->json(['success' => true, 'message' => 'SKPI berhasil ditandatangani fakultas.']);
     }
 
 }

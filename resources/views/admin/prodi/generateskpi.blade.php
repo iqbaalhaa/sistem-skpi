@@ -39,23 +39,60 @@
                                 <th>NIM</th>
                                 <th>Nama</th>
                                 <th>Email</th>
+                                <th>Status Pengajuan</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($mahasiswa as $index => $mhs)
+                            @php
+                                // Cek status pengajuan SKPI terbaru
+                                $latestPengajuan = $mhs->user->pengajuanSkpi->first();
+                                $canGenerate = $latestPengajuan && $latestPengajuan->status === 'diterima_fakultas';
+                            @endphp
                             <tr class="text-center">
                                 <td>{{ $index + 1 }}</td>
                                 <td>
-                                    <form method="POST" action="{{ route('prodi.generateskpi.generate', $mhs->user->id) }}" target="_blank">
-                                        @csrf
-                                        <button type="submit" class="btn btn-warning btn-sm">
+                                    @if($canGenerate)
+                                        <form method="POST" action="{{ route('prodi.generateskpi.generate', $mhs->user->id) }}" target="_blank">
+                                            @csrf
+                                            <button type="submit" class="btn btn-warning btn-sm" title="Generate SKPI">
+                                                <i class="bi bi-printer"></i>
+                                            </button>
+                                        </form>
+                                    @else
+                                        <button type="button" class="btn btn-secondary btn-sm" disabled title="Belum ditandatangani fakultas">
                                             <i class="bi bi-printer"></i>
                                         </button>
-                                    </form>
+                                    @endif
                                 </td>
                                 <td>{{ $mhs->nim }}</td>
                                 <td>{{ $mhs->nama }}</td>
                                 <td>{{ $mhs->user->email }}</td>
+                                <td>
+                                    @if($latestPengajuan)
+                                        @switch($latestPengajuan->status)
+                                            @case('menunggu')
+                                                <span class="badge bg-warning">Menunggu</span>
+                                                @break
+                                            @case('diterima_prodi')
+                                                <span class="badge bg-info">Diterima Prodi</span>
+                                                @break
+                                            @case('diterima_fakultas')
+                                                <span class="badge bg-success">Ditandatangani</span>
+                                                @break
+                                            @case('ditolak_prodi')
+                                                <span class="badge bg-danger">Ditolak Prodi</span>
+                                                @break
+                                            @case('ditolak_fakultas')
+                                                <span class="badge bg-danger">Ditolak Fakultas</span>
+                                                @break
+                                            @default
+                                                <span class="badge bg-secondary">{{ ucfirst($latestPengajuan->status) }}</span>
+                                        @endswitch
+                                    @else
+                                        <span class="badge bg-secondary">Belum Mengajukan</span>
+                                    @endif
+                                </td>
                             </tr>
                             @endforeach
                         </tbody>

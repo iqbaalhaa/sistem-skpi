@@ -144,18 +144,37 @@ function loadMahasiswa(prodiId, namaProdi) {
         tbody.innerHTML = html;
       })
       .catch(err => {
-        document.getElementById('alert-area').innerHTML = `<div class="alert alert-danger">Terjadi kesalahan: ${err.message}</div>`;
+        Swal.fire({
+          title: 'Kesalahan!',
+          text: `Terjadi kesalahan: ${err.message}`,
+          icon: 'error',
+          confirmButtonColor: '#dc3545',
+          confirmButtonText: 'OK'
+        });
         tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">Gagal memuat data.</td></tr>';
       });
 }
 
 /**
  * confirmTandaTangan(id, nama)
- * - tampilkan konfirmasi, lalu panggil tandaTangan()
+ * - tampilkan konfirmasi SweetAlert2, lalu panggil tandaTangan()
  */
 function confirmTandaTangan(id, nama) {
-    if (!confirm(`Tanda tangani SKPI untuk ${nama} ?`)) return;
-    tandaTangan(id);
+    Swal.fire({
+        title: 'Konfirmasi Tanda Tangan',
+        text: `Apakah Anda yakin ingin menandatangani SKPI untuk ${nama}?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Ya, Tanda Tangani!',
+        cancelButtonText: 'Batal',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            tandaTangan(id);
+        }
+    });
 }
 
 /**
@@ -163,39 +182,91 @@ function confirmTandaTangan(id, nama) {
  * - panggil endpoint POST; perlu CSRF token
  */
 function tandaTangan(id) {
-    const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    const token = document.querySelector('meta[name="csrf-token"]');
+    
+    if (!token) {
+        Swal.fire({
+            title: 'Kesalahan!',
+            text: 'CSRF token tidak ditemukan. Silakan refresh halaman.',
+            icon: 'error',
+            confirmButtonColor: '#dc3545',
+            confirmButtonText: 'OK'
+        });
+        console.error('CSRF token meta tag tidak ditemukan');
+        return;
+    }
+
+    const csrfToken = token.getAttribute('content');
+    console.log('Mengirim request tanda tangan untuk ID:', id);
+    console.log('CSRF Token:', csrfToken);
+
+    // Tampilkan loading SweetAlert2
+    Swal.fire({
+        title: 'Memproses...',
+        text: 'Sedang menandatangani SKPI',
+        icon: 'info',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        showConfirmButton: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
 
     fetch(`/fakultas/tandatangan/${id}`, {
         method: 'POST',
         headers: {
-            'X-CSRF-TOKEN': token,
+            'X-CSRF-TOKEN': csrfToken,
             'Accept': 'application/json',
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({})
     })
-    .then(res => res.json())
+    .then(res => {
+        console.log('Response status:', res.status);
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
+    })
     .then(json => {
+        console.log('Response JSON:', json);
         if (json.success) {
-            // tampil notif sederhana, dan reload table (modal)
-            alert(json.message || 'Berhasil');
-            // reload isi tabel: butuh prodiId. kita dapatkan dari judul modal (untuk reload, panggil ulang loadMahasiswa)
-            // mencari prodiId dari judul tidak reliable — jadi lebih baik reload manual: tutup modal dan reload
-            // tapi kita cukup refresh current modal data by triggering click ulang pada prodi (lebih kompleks)
-            // simplest: refresh halaman kecil: reload modal content using currently visible prodiTitle
-            // asumsi: nama prodi unik -> find its id is complex; untuk aman: tutup modal lalu reload modal list
-            // sekarang: tutup modal
-            const bsModal = bootstrap.Modal.getInstance(document.getElementById('modalMahasiswa'));
-            if (bsModal) bsModal.hide();
-            // opsional: reload halaman agar tombol ter-update (atau panggil ulang fungsi loadMahasiswa dengan prodiId jika tersedia)
-            location.reload();
+            // Tampilkan SweetAlert2 success
+            Swal.fire({
+                title: 'Berhasil!',
+                text: json.message || 'SKPI berhasil ditandatangani',
+                icon: 'success',
+                confirmButtonColor: '#28a745',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                // tutup modal
+                const bsModal = bootstrap.Modal.getInstance(document.getElementById('modalMahasiswa'));
+                if (bsModal) bsModal.hide();
+                // reload halaman agar tombol ter-update
+                location.reload();
+            });
         } else {
-            alert(json.message || 'Gagal menandatangani SKPI');
+            // Tampilkan SweetAlert2 error
+            Swal.fire({
+                title: 'Gagal!',
+                text: json.message || 'Gagal menandatangani SKPI',
+                icon: 'error',
+                confirmButtonColor: '#dc3545',
+                confirmButtonText: 'OK'
+            });
         }
     })
     .catch(err => {
-        alert('Terjadi kesalahan jaringan');
-        console.error(err);
+        console.error('Error details:', err);
+        // Tampilkan SweetAlert2 error untuk network issues
+        Swal.fire({
+            title: 'Kesalahan Jaringan!',
+            text: 'Terjadi kesalahan: ' + err.message,
+            icon: 'error',
+            confirmButtonColor: '#dc3545',
+            confirmButtonText: 'OK'
+        });
     });
 }
 
