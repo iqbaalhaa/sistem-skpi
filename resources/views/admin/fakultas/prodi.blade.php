@@ -31,6 +31,18 @@
                                     <label for="kode_prodi" class="form-label">Kode Program Studi</label>
                                     <input type="text" name="kode_prodi" id="kode_prodi" class="form-control" required>
                                   </div>
+                                  <div class="mb-3">
+                                      <label for="edit_jenjang_pendidikan" class="form-label">Jenjang Pendidikan</label>
+                                      <input type="text" name="jenjang_pendidikan" id="edit_jenjang_pendidikan" class="form-control" required>
+                                    </div>
+                                    <div class="mb-3">
+                                      <label for="edit_gelar" class="form-label">Gelar</label>
+                                      <input type="text" name="gelar" id="edit_gelar" class="form-control" required>
+                                    </div>
+                                    <div class="mb-3">
+                                      <label for="edit_akreditasi" class="form-label">Akreditasi</label>
+                                      <input type="text" name="akreditasi" id="edit_akreditasi" class="form-control" required>
+                                    </div>
                                 </div>
                                 <div class="modal-footer">
                                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
@@ -58,10 +70,22 @@
                                     <label for="edit_nama_prodi" class="form-label">Nama Program Studi</label>
                                     <input type="text" name="nama_prodi" id="edit_nama_prodi" class="form-control" required>
                                   </div>
-                                  <div class="mb-3">
-                                    <label for="edit_kode_prodi" class="form-label">Kode Program Studi</label>
-                                    <input type="text" name="kode_prodi" id="edit_kode_prodi" class="form-control" required>
-                                  </div>
+                                    <div class="mb-3">
+                                      <label for="edit_kode_prodi" class="form-label">Kode Program Studi</label>
+                                      <input type="text" name="kode_prodi" id="edit_kode_prodi" class="form-control" required>
+                                    </div>
+                                    <div class="mb-3">
+                                      <label for="edit_jenjang_pendidikan" class="form-label">Jenjang Pendidikan</label>
+                                      <input type="text" name="jenjang_pendidikan" id="edit_jenjang_pendidikan" class="form-control" required>
+                                    </div>
+                                    <div class="mb-3">
+                                      <label for="edit_gelar" class="form-label">Gelar</label>
+                                      <input type="text" name="gelar" id="edit_gelar" class="form-control" required>
+                                    </div>
+                                    <div class="mb-3">
+                                      <label for="edit_akreditasi" class="form-label">Akreditasi</label>
+                                      <input type="text" name="akreditasi" id="edit_akreditasi" class="form-control" required>
+                                    </div>
                                 </div>
                                 <div class="modal-footer">
                                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
@@ -79,8 +103,11 @@
                                     <thead>
                                         <tr>
                                             <th>No.</th>
+                                            <th>Kode</th>
                                             <th>Program Studi</th>
-                                            <th>Kode Program Studi</th>
+                                            <th>Jenjang Pendidikan</th>
+                                            <th>Gelar</th>
+                                            <th>Akreditasi</th>
                                             <th>Aksi</th>
                                         </tr>
                                     </thead>
@@ -88,8 +115,11 @@
                                         @forelse($prodis as $prodi)
                                             <tr>
                                                 <td>{{ $loop->iteration }}</td>
-                                                <td>{{ $prodi->nama_prodi ?? '-' }}</td>
                                                 <td>{{ $prodi->kode_prodi ?? '-' }}</td>
+                                                <td>{{ $prodi->nama_prodi ?? '-' }}</td>
+                                                <td>{{ $prodi->jenjang_pendidikan ?? '-' }}</td>
+                                                <td>{{ $prodi->gelar ?? '-' }}</td>
+                                                <td>{{ $prodi->akreditasi ?? '-' }}</td>
                                                 <td>
                                                     <a href="#" class="btn btn-sm btn-warning btn-edit-prodi" data-id="{{ $prodi->id }}">Edit</a>
                                                     <form action="{{ route('admin.fakultas.prodi.destroy', $prodi->id) }}" method="POST" style="display:inline-block">
@@ -127,6 +157,9 @@
                     .then(data => {
                         document.getElementById('edit_nama_prodi').value = data.nama_prodi;
                         document.getElementById('edit_kode_prodi').value = data.kode_prodi;
+                        document.getElementById('edit_jenjang_pendidikan').value = data.jenjang_pendidikan;
+                        document.getElementById('edit_gelar').value = data.gelar;
+                        document.getElementById('edit_akreditasi').value = data.akreditasi;
                         document.getElementById('formEditProdi').action = '/admin/fakultas/prodi/' + id;
                         var modal = new bootstrap.Modal(document.getElementById('modalEditProdi'));
                         modal.show();

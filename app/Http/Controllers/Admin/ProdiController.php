@@ -25,10 +25,16 @@ class ProdiController extends Controller
         $request->validate([
             'nama_prodi' => 'required|string|max:255',
             'kode_prodi' => 'required|string|max:50',
+            'jenjang_pendidikan' => 'required|string|max:50',
+            'gelar' => 'required|string|max:50',
+            'akreditasi' => 'required|string|max:50',
         ]);
         Prodi::create([
             'nama_prodi' => $request->nama_prodi,
             'kode_prodi' => $request->kode_prodi,
+            'jenjang_pendidikan' => $request->jenjang_pendidikan,
+            'gelar' => $request->gelar,
+            'akreditasi' => $request->akreditasi,
         ]);
         return redirect()->route('admin.fakultas.prodi')->with('success', 'Program Studi berhasil ditambahkan!');
     }
@@ -58,11 +64,17 @@ class ProdiController extends Controller
         $request->validate([
             'nama_prodi' => 'required|string|max:255',
             'kode_prodi' => 'required|string|max:50',
+            'jenjang_pendidikan' => 'required|string|max:50',
+            'gelar' => 'required|string|max:50',
+            'akreditasi' => 'required|string|max:50',
         ]);
         $prodi = Prodi::findOrFail($id);
         $prodi->update([
             'nama_prodi' => $request->nama_prodi,
             'kode_prodi' => $request->kode_prodi,
+            'jenjang_pendidikan' => $request->jenjang_pendidikan,
+            'gelar' => $request->gelar,
+            'akreditasi' => $request->akreditasi,
         ]);
         return redirect()->route('admin.fakultas.prodi')->with('success', 'Program Studi berhasil diupdate!');
     }

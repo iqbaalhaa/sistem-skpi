@@ -23,6 +23,7 @@ class User extends Authenticatable
         'password',
         'role',
         'prodi_id',
+        'foto',
     ];
 
     /**
@@ -91,6 +92,11 @@ class User extends Authenticatable
     public function prodi()
     {
         return $this->belongsTo(\App\Models\Prodi::class, 'prodi_id');
+    }
+    
+    public function biodataAdmin()
+    {
+        return $this->hasOne(BiodataAdmin::class, 'user_id');
     }
 }
 

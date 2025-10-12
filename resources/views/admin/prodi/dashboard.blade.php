@@ -92,7 +92,7 @@
                     <div class="row align-items-center">
                         <div class="col-md-8">
                             <h2 class="mb-2 fw-bold">Selamat datang, {{ Auth::user()->username }}!</h2>
-                            <p class="mb-0 opacity-75 fs-5">Dashboard Admin Prodi - Kelola dan pantau aktivitas mahasiswa dengan mudah</p>
+                            <p class="mb-0 opacity-75 fs-5">Dashboard Admin Prodi</p>
                             <small class="opacity-50">{{ date('d F Y, H:i') }}</small>
                         </div>
                         <div class="col-md-4 text-end">

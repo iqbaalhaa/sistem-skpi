@@ -12,6 +12,48 @@
   <link rel="stylesheet" href="{{ asset('backend/assets/compiled/css/iconly.css') }}">
   <!-- Theme Override - Must be last -->
   <link rel="stylesheet" href="{{ asset('backend/assets/compiled/css/theme-override.css') }}">
+
+
+  <style>
+
+  /* hover state: langsung berubah jadi biru muda */
+  .card-hover:hover {
+      background:radial-gradient(circle,rgba(255, 255, 255, 1) 0%, rgba(17, 114, 188, 1) 70%); !important;            /* solid light-blue on hover */
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 12px 30px rgba(13, 110, 253, 0.12);
+  }
+
+  /* ubah warna teks/ikon saat hover supaya kontras */
+  .card-hover:hover .card-title,
+  .card-hover:hover .text-muted,
+  .card-hover:hover .icon-wrap i {
+      color:rgb(0, 57, 143) !important; /* bootstrap primary blue */
+  }
+
+  .card-hover:hover .badge {
+    transform: scale(1.1);
+    transition: 0.2s ease;
+}
+
+  /* ikon lebih visible */
+  .icon-wrap i {
+      color: #0dcaf0; /* default indigo-ish */
+      transition: color 0.25s ease !important;
+  }
+
+  /* transisi halus untuk teks */
+  .card-title {
+      transition: color 0.25s ease !important;
+  }
+
+  /* mobile: jangan gunakan transform scale berlebihan */
+  @media (max-width: 576px) {
+      .card-hover:hover {
+          transform: translateY(-4px) !important;
+      }
+  }
+  </style>
+
 </head>
 
 <body>

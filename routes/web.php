@@ -5,7 +5,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Mahasiswa\PenghargaanPrestasiController;
 use App\Http\Controllers\Mahasiswa\FormSkpiController;
+use App\Http\Controllers\Admin\AdminBiodataController;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Admin\Fakultas\FakultasController;
 
 /*
 |--------------------------------------------------------------------------
@@ -137,8 +139,6 @@ Route::middleware(['auth', 'role:admin_prodi'])->group(function () {
 
 Route::get('/mahasiswa/skpi', [FormSkpiController::class, 'index'])->name('mahasiswa.skpi');
 
-
-
 Route::post('/mahasiswa/penghargaan', [FormSkpiController::class, 'storePenghargaan'])->name('penghargaan.store');
 Route::post('/mahasiswa/organisasi', [FormSkpiController::class, 'storeOrganisasi'])->name('organisasi.store');
 Route::post('/mahasiswa/organisasi/{id}/update', [FormSkpiController::class, 'updateOrganisasi'])->name('organisasi.update');
@@ -151,3 +151,15 @@ Route::post('/mahasiswa/penghargaan/{id}/update', [FormSkpiController::class, 'u
 Route::delete('/mahasiswa/penghargaan/{id}', [FormSkpiController::class, 'destroyPenghargaan'])->name('penghargaan.destroy');
 Route::post('/mahasiswa/magang/{id}/update', [FormSkpiController::class, 'updateMagang'])->name('magang.update');
 Route::post('/mahasiswa/keagamaan/{id}/update', [FormSkpiController::class, 'updateKeagamaan'])->name('keagamaan.update');
+
+Route::middleware(['auth', 'role:admin_prodi'])->group(function () {
+    Route::get('/admin', [AdminBiodataController::class, 'index'])->name('admin.biodata');
+    Route::get('/admin/edit/{id}', [AdminBiodataController::class, 'edit'])->name('admin.biodata.edit');
+    Route::post('/admin/update/{id}', [AdminBiodataController::class, 'update'])->name('admin.biodata.update');
+});
+
+Route::middleware(['auth', 'role:admin_fakultas'])->group(function () {
+    Route::get('/fakultas/verifikasi-skpi', [FakultasController::class, 'index'])->name('admin.fakultas.verifikasiskpi');
+    Route::get('/fakultas/prodi/{id}/mahasiswa', [FakultasController::class, 'getMahasiswaByProdi'])->name('fakultas.prodi.mahasiswa');
+    Route::post('/fakultas/tandatangan/{id}', [FakultasController::class, 'tandaTangan'])->name('fakultas.tandatangan');
+});

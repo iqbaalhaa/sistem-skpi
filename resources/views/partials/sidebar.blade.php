@@ -79,7 +79,7 @@
                         </li>
                         <li class="sidebar-item {{ request()->routeIs('prodi.mahasiswa.*') ? 'active' : '' }}">
                             <a href="{{ route('prodi.mahasiswa.index') }}" class="sidebar-link">
-                                <i class="bi bi-people"></i>
+                                <i class="bi bi-people-fill"></i>
                                 <span>Kelola Mahasiswa</span>
                             </a>
                         </li>
@@ -89,12 +89,18 @@
                                 <span>Generate SKPI</span>
                             </a>
                         </li>
-                        <li class="sidebar-item">
+                        <li class="sidebar-item {{ request()->routeIs('admin.biodata') ? 'active' : '' }}">
+                            <a href="{{ route('admin.biodata') }}" class="sidebar-link">
+                                <i class="bi bi-person-fill"></i>
+                                <span>Profil</span>
+                            </a>
+                        </li>
+                        <!-- <li class="sidebar-item">
                             <a href="#" class="sidebar-link">
                                 <i class="bi bi-graph-up"></i>
                                 <span>Laporan</span>
                             </a>
-                        </li>
+                        </li> -->
                     @elseif(Auth::user()->role === 'admin_fakultas')
                         <li class="sidebar-item {{ request()->routeIs('fakultas.dashboard') ? 'active' : '' }}">
                             <a href="{{ route('fakultas.dashboard') }}" class="sidebar-link">
@@ -102,8 +108,8 @@
                                 <span>Dashboard</span>
                             </a>
                         </li>
-                        <li class="sidebar-item">
-                            <a href="#" class="sidebar-link">
+                        <li class="sidebar-item {{ request()->routeIs('admin.fakultas.verifikasiskpi') ? 'active' : '' }}">
+                            <a href="{{ route('admin.fakultas.verifikasiskpi') }}" class="sidebar-link">
                                 <i class="bi bi-check-circle"></i>
                                 <span>Verifikasi SKPI</span>
                             </a>

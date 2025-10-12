@@ -75,9 +75,13 @@ class GenerateSkpiController extends Controller
         $processor->setValue('nama_lengkap', $biodata->nama ?? '-');
         $processor->setValue('nim', $biodata->nim ?? '-');
         $processor->setValue('prodi', optional($user->prodi)->nama_prodi ?? '-');
+        $processor->setValue('akreditasi', optional($user->prodi)->akreditasi ?? '-');
+        $processor->setValue('jenjang_pendidikan', optional($user->prodi)->jenjang_pendidikan ?? '-');
+        $processor->setValue('gelar', optional($user->prodi)->gelar ?? '-');
         $processor->setValue('ttl', $biodata->tempat_lahir . ', ' . \Carbon\Carbon::parse($biodata->tanggal_lahir)->format('d-m-Y'));
         $processor->setValue('tahun_masuk', $biodata->tahun_masuk ?? '-');
         $processor->setValue('tanggal_cetak', Carbon::now()->translatedFormat('d F Y'));
+        
 
         // Anda bisa menambahkan setValue lainnya sesuai placeholder template Word
 

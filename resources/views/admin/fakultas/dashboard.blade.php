@@ -92,7 +92,7 @@
                     <div class="row align-items-center">
                         <div class="col-md-8">
                             <h2 class="mb-2 fw-bold">Selamat datang, {{ Auth::user()->username }}!</h2>
-                            <p class="mb-0 opacity-75 fs-5">Dashboard Admin Fakultas - Kelola dan pantau aktivitas prodi dengan mudah</p>
+                            <p class="mb-0 opacity-75 fs-5">Dashboard Admin Fakultas</p>
                             <small class="opacity-50">{{ date('d F Y, H:i') }}</small>
                         </div>
                         <div class="col-md-4 text-end">
@@ -249,7 +249,7 @@
                 <div class="card-body">
                     <div class="table-responsive table-scroll">
                         <table class="table table-hover">
-                            <thead class="table-light sticky-top">
+                            <thead class="table sticky-top">
                                 <tr>
                                     <th><i class="bi bi-calendar-event me-1"></i>Waktu</th>
                                     <th><i class="bi bi-person me-1"></i>Mahasiswa</th>

@@ -72,15 +72,11 @@
             <div class="organic-border"></div>
 
             <div class="mindful-header">
-                <!-- <div class="zen-logo">
-                    <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
-                        <circle cx="28" cy="28" r="26" stroke="currentColor" stroke-width="2" fill="none" opacity="0.6"/>
-                        <circle cx="28" cy="28" r="18" stroke="currentColor" stroke-width="1.5" fill="none" opacity="0.8"/>
-                        <circle cx="28" cy="28" r="10" fill="currentColor" opacity="0.9"/>
-                        <path d="M28 18v20M18 28h20" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-                    </svg>
-                    <div class="zen-glow"></div>
-                </div> -->
+                <div class="zen-logo">
+                    <div class="zen-logo">
+                        <img src="{{ asset('login/logo.png') }}" alt="Logo">
+                    </div>
+                </div>
                 <h1>REGISTER</h1>
                 <p>Sistem Informasi Surat Keterangan Pendamping Ijazah</p>
             </div>
