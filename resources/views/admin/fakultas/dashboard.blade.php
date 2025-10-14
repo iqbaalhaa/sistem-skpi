@@ -49,31 +49,6 @@
         position: relative;
     }
     
-    /* Table scroll styling */
-    .table-scroll {
-        max-height: 400px;
-        overflow-y: auto;
-        border-radius: 0.375rem;
-    }
-    
-    .table-scroll::-webkit-scrollbar {
-        width: 6px;
-    }
-    
-    .table-scroll::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 3px;
-    }
-    
-    .table-scroll::-webkit-scrollbar-thumb {
-        background: #c1c1c1;
-        border-radius: 3px;
-    }
-    
-    .table-scroll::-webkit-scrollbar-thumb:hover {
-        background: #a8a8a8;
-    }
-    
     /* Sticky header for table */
     .sticky-top {
         position: sticky;
@@ -83,7 +58,6 @@
     }
 </style>
 
-<div class="container-fluid dashboard-container">
     <!-- Welcome Section -->
     <div class="row mb-4">
         <div class="col-12">
@@ -323,8 +297,6 @@
             </div>
         </div>
     </div>
-</div>
-
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>

@@ -6,7 +6,7 @@
 <div class="container-fluid">
     <!-- Welcome Section -->
     <div class="row">
-        <div class="col-12">
+        <div class="col-8">
             <div class="card">
                 <div class="card-body py-4">
                     <div class="d-flex justify-content-between align-items-center">
@@ -33,8 +33,18 @@
                             </p>
                         </div>
                         <div>
-                            <a href="#" class="btn btn-primary">
-                                <i class="bi bi-plus-circle"></i> Ajukan SKPI Baru
+                            @php
+                                $latestPengajuan = \App\Models\PengajuanSkpi::where('user_id', Auth::id())
+                                    ->latest('created_at')
+                                    ->first();
+                                $status = $latestPengajuan->status ?? null;
+                                $isSiapCetak = $status === 'diterima_fakultas';
+                            @endphp
+
+                            <a href="#"
+                            class="btn btn-warning {{ $isSiapCetak ? '' : 'disabled' }}"
+                            title="{{ $isSiapCetak ? 'Cetak SKPI Anda' : 'Belum dapat dicetak (menunggu tanda tangan fakultas)' }}">
+                                <i class="bi bi-printer-fill"> Print SKPI Saya </i>
                             </a>
                         </div>
                     </div>
@@ -42,9 +52,9 @@
             </div>
         </div>
     </div>
-
+    
     <!-- Quick Stats -->
-    <div class="row g-3">
+    <div class="row">
         <div class="col-md-3">
             <div class="card bg-primary text-white h-100">
                 <div class="card-body d-flex flex-column justify-content-center" style="min-height: 140px;">
@@ -107,6 +117,8 @@
         </div>
     </div>
 
+
+    <br>
     <!-- Recent Activities and Progress -->
     <div class="row">
         <div class="col-md-8">

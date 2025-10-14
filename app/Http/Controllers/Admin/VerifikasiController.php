@@ -41,8 +41,8 @@ class VerifikasiController extends Controller
                 ]);
             }
             
-            // Ambil prodi_id dari users.prodi_id, fallback ke biodata_mahasiswa.prodi_id jika null
-            $mahasiswaProdiId = $item->user->prodi_id ?? optional($item->user->biodataMahasiswa)->prodi_id;
+            // Ambil prodi_id dengan prioritas dari biodata_mahasiswa.prodi_id, fallback ke users.prodi_id jika null
+            $mahasiswaProdiId = optional($item->user->biodataMahasiswa)->prodi_id ?? $item->user->prodi_id;
 
             if ($mahasiswaProdiId != $adminProdiId) {
                 return response()->json([
@@ -80,7 +80,10 @@ class VerifikasiController extends Controller
             ->where('role', 'mahasiswa')
             ->findOrFail($userId);
 
-        if ($mahasiswa->prodi_id != $adminProdiId) {
+        // Ambil prodi_id mahasiswa dengan prioritas dari biodata_mahasiswa
+        $mahasiswaProdiId = optional($mahasiswa->biodataMahasiswa)->prodi_id ?? $mahasiswa->prodi_id;
+
+        if ($mahasiswaProdiId != $adminProdiId) {
             return response()->json([
                 'success' => false,
                 'message' => 'Anda tidak memiliki akses untuk memverifikasi data dari prodi lain'

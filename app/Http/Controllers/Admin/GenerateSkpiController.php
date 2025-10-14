@@ -18,12 +18,14 @@ class GenerateSkpiController extends Controller
     {
         $adminProdiId = Auth::user()->prodi_id;
 
+        // Ambil mahasiswa berdasarkan biodata_mahasiswa.prodi_id (prioritas biodata),
+        // dan pastikan user berperan sebagai mahasiswa
         $mahasiswa = BiodataMahasiswa::with(['user.pengajuanSkpi' => function($query) {
                 $query->latest('created_at');
             }])
-            ->whereHas('user', function ($q) use ($adminProdiId) {
-                $q->where('role', 'mahasiswa')
-                  ->where('prodi_id', $adminProdiId);
+            ->where('prodi_id', $adminProdiId)
+            ->whereHas('user', function ($q) {
+                $q->where('role', 'mahasiswa');
             })
             ->get();
 
@@ -38,7 +40,9 @@ class GenerateSkpiController extends Controller
             ->where('role', 'mahasiswa')
             ->findOrFail($userId);
 
-        if ($user->prodi_id !== $adminProdiId) {
+        // Cek akses dengan prioritas biodata_mahasiswa.prodi_id
+        $userProdiId = optional($user->biodataMahasiswa)->prodi_id ?? $user->prodi_id;
+        if ($userProdiId !== $adminProdiId) {
             abort(403, 'Anda tidak memiliki akses untuk mahasiswa prodi lain.');
         }
 

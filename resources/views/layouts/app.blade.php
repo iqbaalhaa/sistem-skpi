@@ -96,8 +96,6 @@
       </header>
 
       {{-- Page Content --}}
-      <div class="page-heading">
-      </div>
       <div class="page-content">
         @yield('content')
       </div>
