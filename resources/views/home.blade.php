@@ -120,7 +120,7 @@
 
                     <div class="col-lg-6" data-aos="fade-up">
                         <div class="ratio ratio-16x9">
-                            <iframe src="https://www.youtube-nocookie.com/embed/QX7VVr9YlcE"
+                            <iframe src="https://www.youtube-nocookie.com/embed/DzfUr5rB4X0"
                                     title="Tentang SKPI SAINTEK" 
                                     frameborder="0" 
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
