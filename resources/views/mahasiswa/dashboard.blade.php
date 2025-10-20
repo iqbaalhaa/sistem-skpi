@@ -129,39 +129,79 @@
                 </div>
                 <div class="card-body">
                     <div class="activity-feed">
-                        <div class="feed-item pb-3 mb-3 border-bottom">
-                            <div class="d-flex align-items-center mb-2">
-                                <div class="bg-success rounded-circle p-2 me-3">
-                                    <i class="bi bi-check-lg text-white"></i>
-                                </div>
-                                <div>
-                                    <h6 class="mb-1">Sertifikat Kompetensi Bahasa Inggris Ditambahkan</h6>
-                                    <small class="text-muted">2 hari yang lalu</small>
+                        @php
+                            $activities = collect();
+                            
+                            // Gather activities from different tables
+                            $prestasi = Auth::user()->prestasi()->latest('created_at')->take(5)->get()
+                                ->map(function($item) {
+                                    return [
+                                        'type' => 'prestasi',
+                                        'title' => $item->keterangan_indonesia,
+                                        'icon' => 'bi-trophy',
+                                        'bg' => 'bg-primary',
+                                        'date' => $item->created_at
+                                    ];
+                                });
+
+                            $organisasi = Auth::user()->organisasi()->latest('created_at')->take(5)->get()
+                                ->map(function($item) {
+                                    return [
+                                        'type' => 'organisasi',
+                                        'title' => $item->organisasi,
+                                        'icon' => 'bi-people',
+                                        'bg' => 'bg-success',
+                                        'date' => $item->created_at
+                                    ];
+                                });
+
+                            $bahasa = Auth::user()->kompetensiBahasa()->latest('created_at')->take(5)->get()
+                                ->map(function($item) {
+                                    return [
+                                        'type' => 'bahasa',
+                                        'title' => $item->nama_kompetensi . ' (' . $item->skor_kompetensi . ')',
+                                        'icon' => 'bi-translate',
+                                        'bg' => 'bg-info',
+                                        'date' => $item->created_at
+                                    ];
+                                });
+
+                            $magang = Auth::user()->magang()->latest('created_at')->take(5)->get()
+                                ->map(function($item) {
+                                    return [
+                                        'type' => 'magang',
+                                        'title' => $item->lembaga,
+                                        'icon' => 'bi-briefcase',
+                                        'bg' => 'bg-warning',
+                                        'date' => $item->created_at
+                                    ];
+                                });
+
+                            // Merge and sort all activities
+                            $activities = $prestasi->concat($organisasi)
+                                ->concat($bahasa)
+                                ->concat($magang)
+                                ->sortByDesc('date')
+                                ->take(5);
+                        @endphp
+
+                        @forelse($activities as $activity)
+                            <div class="feed-item {{ !$loop->last ? 'pb-3 mb-3 border-bottom' : '' }}">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="{{ $activity['bg'] }} rounded-circle p-2 me-3">
+                                        <i class="bi {{ $activity['icon'] }} text-white"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-1">{{ $activity['title'] }}</h6>
+                                        <small class="text-muted">{{ $activity['date']->diffForHumans() }}</small>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="feed-item pb-3 mb-3 border-bottom">
-                            <div class="d-flex align-items-center mb-2">
-                                <div class="bg-primary rounded-circle p-2 me-3">
-                                    <i class="bi bi-star text-white"></i>
-                                </div>
-                                <div>
-                                    <h6 class="mb-1">Prestasi Baru Diajukan</h6>
-                                    <small class="text-muted">4 hari yang lalu</small>
-                                </div>
+                        @empty
+                            <div class="text-center text-muted">
+                                <p>Belum ada aktivitas</p>
                             </div>
-                        </div>
-                        <div class="feed-item">
-                            <div class="d-flex align-items-center mb-2">
-                                <div class="bg-info rounded-circle p-2 me-3">
-                                    <i class="bi bi-pencil text-white"></i>
-                                </div>
-                                <div>
-                                    <h6 class="mb-1">Pengalaman Organisasi Diperbarui</h6>
-                                    <small class="text-muted">1 minggu yang lalu</small>
-                                </div>
-                            </div>
-                        </div>
+                        @endforelse
                     </div>
                 </div>
             </div>
