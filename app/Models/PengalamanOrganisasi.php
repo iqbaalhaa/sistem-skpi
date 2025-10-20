@@ -17,6 +17,7 @@ class PengalamanOrganisasi extends Model
         'bukti',
         'catatan',
         'verifikasi',
+        'nomor_sertifikat',
     ];
     public function user() {
         return $this->belongsTo(User::class);

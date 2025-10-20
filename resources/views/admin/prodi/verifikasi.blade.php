@@ -31,22 +31,22 @@
                     if($mhs->organisasi->contains('verifikasi', 1)) $verified++;
                 }
                 
-                // Count bahasa
-                if($mhs->kompetensiBahasa && count($mhs->kompetensiBahasa) > 0) {
-                    $total++;
-                    if($mhs->kompetensiBahasa->contains('verifikasi', 1)) $verified++;
-                }
-                
                 // Count magang
                 if($mhs->magang && count($mhs->magang) > 0) {
                     $total++;
                     if($mhs->magang->contains('verifikasi', 1)) $verified++;
                 }
                 
-                // Count keagamaan
-                if($mhs->kompetensiKeagamaan && count($mhs->kompetensiKeagamaan) > 0) {
+                // Count keahlian tambahan
+                if($mhs->keahlianTambahan && count($mhs->keahlianTambahan) > 0) {
                     $total++;
-                    if($mhs->kompetensiKeagamaan->contains('verifikasi', 1)) $verified++;
+                    if($mhs->keahlianTambahan->contains('verifikasi', 1)) $verified++;
+                }
+                
+                // Count lain lain
+                if($mhs->lainLain && count($mhs->lainLain) > 0) {
+                    $total++;
+                    if($mhs->lainLain->contains('verifikasi', 1)) $verified++;
                 }
                 
                 $progress = $total > 0 ? ($verified / $total) * 100 : 0;
@@ -87,44 +87,90 @@
 			<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 		  </div>
 		  <div class="modal-body">
-			<h5>Penghargaan/Prestasi</h5>
+
+            <h5>Keahlian Tambahan</h5>
 			<table class="table table-hover mb-3">
 				<thead>
 					<tr>
-						<th>Keterangan Indonesia</th>
-						<th>Keterangan Inggris</th>
-						<th>Jenis Organisasi/Lembaga</th>
+						<th>Nama Keahlian</th>
+						<th>Lembaga</th>
 						<th>Tahun</th>
-						<th>Bukti</th>
-						<th>Catatan</th>
+						<th>Nomor Sertifikat</th>
+						<th>Bukti Sertifikat</th>
 						<th>Status Verifikasi</th>
-						<th>Aksi</th>
+                        <th>Aksi</th>
 					</tr>
 				</thead>
 				<tbody>
-					@foreach($mhs->prestasi ?? [] as $item)
+					@foreach($mhs->keahlianTambahan ?? [] as $item)
 					<tr>
-						<td>{{ $item->keterangan_indonesia }}</td>
-						<td>{{ $item->keterangan_inggris }}</td>
-						<td>{{ $item->jenis_organisasi }}</td>
-						<td>{{ $item->tahun }}</td>
+						<td>{{ $item->nama_keahlian }}</td>
+						<td>{{ $item->lembaga ?? '-' }}</td>
+						<td>{{ $item->tahun ?? '-' }}</td>
+						<td>{{ $item->nomor_sertifikat ?? '-' }}</td>
 						<td>@if($item->bukti)<a href="{{ asset('storage/'.$item->bukti) }}" target="_blank">Lihat</a>@endif</td>
-						<td>{{ $item->catatan }}</td>
 						<td>
                             @if($item->verifikasi === 1)
                                 <span class="badge bg-success">Diterima</span>
-                            @elseif($item->verifikasi === 0)
+                            @elseif($item->verifikasi === 2)
                                 <span class="badge bg-danger">Ditolak</span>
                             @else
                                 <span class="badge bg-secondary">Pending</span>
                             @endif
                         </td>
 						<td>
-                            @if($item->verifikasi === null || $item->verifikasi === 0)
+                                    @if($item->verifikasi === 1)
+                                        <button onclick="verifikasiItem('{{ $item->id }}', 'keahlian-tambahan', 2, this)" class="btn btn-danger btn-sm" title="Tolak"><i class="bi bi-x-circle"></i></button>
+                                    @elseif($item->verifikasi === 2)
+                                        <button onclick="verifikasiItem('{{ $item->id }}', 'keahlian-tambahan', 1, this)" class="btn btn-success btn-sm" title="Terima"><i class="bi bi-check-circle"></i></button>
+                                    @else
+                                        <button onclick="verifikasiItem('{{ $item->id }}', 'keahlian-tambahan', 1, this)" class="btn btn-success btn-sm" title="Terima"><i class="bi bi-check-circle"></i></button>
+                                        <button onclick="verifikasiItem('{{ $item->id }}', 'keahlian-tambahan', 2, this)" class="btn btn-danger btn-sm" title="Tolak"><i class="bi bi-x-circle"></i></button>
+                                    @endif
+				        </td>
+					</tr>
+					@endforeach
+				</tbody>
+			</table>
+
+			<h5>Penghargaan/Prestasi</h5>
+			<table class="table table-hover mb-3">
+				<thead>
+					<tr>
+                        <th>Nama Penghargaan/Prestasi</th>
+                        <th>Jenis Organisasi/Lembaga</th>
+                        <th>Tahun</th>
+                        <th>Nomor Sertifikat</th>
+                        <th>Bukti</th>
+                        <th>Status Verifikasi</th>
+                        <th>Aksi</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach($mhs->prestasi ?? [] as $item)
+					<tr>
+						<td>{{ $item->keterangan_indonesia }}</td>
+						<td>{{ $item->jenis_organisasi }}</td>
+						<td>{{ $item->tahun }}</td>
+        				<td>{{ $item->nomor_sertifikat ?? '-' }}</td>
+						<td>@if($item->bukti)<a href="{{ asset('storage/'.$item->bukti) }}" target="_blank">Lihat</a>@endif</td>
+        				<td>
+        					@if($item->verifikasi === 1)
+        						<span class="badge bg-success">Diterima</span>
+        					@elseif($item->verifikasi === 2)
+        						<span class="badge bg-danger">Ditolak</span>
+        					@else
+        						<span class="badge bg-secondary">Pending</span>
+        					@endif
+        				</td>
+						<td>
+                            @if($item->verifikasi === 1)
+                                <button onclick="verifikasiItem('{{ $item->id }}', 'prestasi', 2, this)" class="btn btn-danger btn-sm" title="Tolak"><i class="bi bi-x-circle"></i></button>
+                            @elseif($item->verifikasi === 2)
                                 <button onclick="verifikasiItem('{{ $item->id }}', 'prestasi', 1, this)" class="btn btn-success btn-sm" title="Terima"><i class="bi bi-check-circle"></i></button>
-                                <button onclick="verifikasiItem('{{ $item->id }}', 'prestasi', 0, this)" class="btn btn-danger btn-sm" title="Tolak"><i class="bi bi-x-circle"></i></button>
-                            @elseif($item->verifikasi === 1)
-                                <button onclick="verifikasiItem('{{ $item->id }}', 'prestasi', 0, this)" class="btn btn-danger btn-sm" title="Tolak"><i class="bi bi-x-circle"></i></button>
+                            @else
+                                <button onclick="verifikasiItem('{{ $item->id }}', 'prestasi', 1, this)" class="btn btn-success btn-sm" title="Terima"><i class="bi bi-check-circle"></i></button>
+                                <button onclick="verifikasiItem('{{ $item->id }}', 'prestasi', 2, this)" class="btn btn-danger btn-sm" title="Tolak"><i class="bi bi-x-circle"></i></button>
                             @endif
 				        </td>
 					</tr>
@@ -139,8 +185,8 @@
 						<th>Organisasi</th>
 						<th>Tahun Awal</th>
 						<th>Tahun Akhir</th>
+						<th>Nomor Sertifikat</th>
 						<th>Bukti</th>
-						<th>Catatan</th>
 						<th>Status Verifikasi</th>
                         <th>Aksi</th>
 					</tr>
@@ -148,86 +194,45 @@
 				<tbody>
 					@foreach($mhs->organisasi ?? [] as $item)
 					<tr>
-						<td>{{ $item->organisasi }}</td>
-						<td>{{ $item->tahun_awal }}</td>
-						<td>{{ $item->tahun_akhir }}</td>
-						<td>@if($item->bukti)<a href="{{ asset('storage/'.$item->bukti) }}" target="_blank">Lihat</a>@endif</td>
-						<td>{{ $item->catatan }}</td>
-						<td>
+                        <td>{{ $item->organisasi }}</td>
+                        <td>{{ $item->tahun_awal }}</td>
+                        <td>{{ $item->tahun_akhir }}</td>
+                        <td>{{ $item->nomor_sertifikat ?? '-' }}</td>
+                        <td>@if($item->bukti)<a href="{{ asset('storage/'.$item->bukti) }}" target="_blank">Lihat</a>@endif</td>
+                        <td>
                             @if($item->verifikasi === 1)
                                 <span class="badge bg-success">Diterima</span>
-                            @elseif($item->verifikasi === 0)
+                            @elseif($item->verifikasi === 2)
                                 <span class="badge bg-danger">Ditolak</span>
                             @else
                                 <span class="badge bg-secondary">Pending</span>
                             @endif
                         </td>
-						<td>
-                            @if($item->verifikasi === null || $item->verifikasi === 0)
+                        <td>
+                            @if($item->verifikasi === 1)
+                                <button onclick="verifikasiItem('{{ $item->id }}', 'organisasi', 2, this)" class="btn btn-danger btn-sm" title="Tolak"><i class="bi bi-x-circle"></i></button>
+                            @elseif($item->verifikasi === 2)
                                 <button onclick="verifikasiItem('{{ $item->id }}', 'organisasi', 1, this)" class="btn btn-success btn-sm" title="Terima"><i class="bi bi-check-circle"></i></button>
-                                <button onclick="verifikasiItem('{{ $item->id }}', 'organisasi', 0, this)" class="btn btn-danger btn-sm" title="Tolak"><i class="bi bi-x-circle"></i></button>
-                            @elseif($item->verifikasi === 1)
-                                <button onclick="verifikasiItem('{{ $item->id }}', 'organisasi', 0, this)" class="btn btn-danger btn-sm" title="Tolak"><i class="bi bi-x-circle"></i></button>
-                            @endif
-				        </td>
-					</tr>
-					@endforeach
-				</tbody>
-			</table>
-
-			<h5>Kompetensi Bahasa Internasional</h5>
-			<table class="table table-hover mb-3">
-				<thead>
-					<tr>
-						<th>Nama Kompetensi</th>
-						<th>Skor Kompetensi</th>
-						<th>Tahun</th>
-						<th>Bukti</th>
-						<th>Catatan</th>
-						<th>Status Verifikasi</th>
-                        <th>Aksi</th>
-					</tr>
-				</thead>
-				<tbody>
-					@foreach($mhs->kompetensiBahasa ?? [] as $item)
-					<tr>
-						<td>{{ $item->nama_kompetensi }}</td>
-						<td>{{ $item->skor_kompetensi }}</td>
-						<td>{{ $item->tahun }}</td>
-						<td>@if($item->bukti)<a href="{{ asset('storage/'.$item->bukti) }}" target="_blank">Lihat</a>@endif</td>
-						<td>{{ $item->catatan }}</td>
-						<td>
-                            @if($item->verifikasi === 1)
-                                <span class="badge bg-success">Diterima</span>
-                            @elseif($item->verifikasi === 0)
-                                <span class="badge bg-danger">Ditolak</span>
                             @else
-                                <span class="badge bg-secondary">Pending</span>
+                                <button onclick="verifikasiItem('{{ $item->id }}', 'organisasi', 1, this)" class="btn btn-success btn-sm" title="Terima"><i class="bi bi-check-circle"></i></button>
+                                <button onclick="verifikasiItem('{{ $item->id }}', 'organisasi', 2, this)" class="btn btn-danger btn-sm" title="Tolak"><i class="bi bi-x-circle"></i></button>
                             @endif
                         </td>
-						<td>
-                            @if($item->verifikasi === null || $item->verifikasi === 0)
-                                <button onclick="verifikasiItem('{{ $item->id }}', 'bahasa', 1, this)" class="btn btn-success btn-sm" title="Terima"><i class="bi bi-check-circle"></i></button>
-                                <button onclick="verifikasiItem('{{ $item->id }}', 'bahasa', 0, this)" class="btn btn-danger btn-sm" title="Tolak"><i class="bi bi-x-circle"></i></button>
-                            @elseif($item->verifikasi === 1)
-                                <button onclick="verifikasiItem('{{ $item->id }}', 'bahasa', 0, this)" class="btn btn-danger btn-sm" title="Tolak"><i class="bi bi-x-circle"></i></button>
-                            @endif
 				        </td>
 					</tr>
 					@endforeach
 				</tbody>
 			</table>
 
-			<h5>Pengalaman Magang</h5>
+			<h5>Pengalaman Kerja/Magang</h5>
 			<table class="table table-hover mb-3">
 				<thead>
 					<tr>
-						<th>Keterangan Indonesia</th>
-						<th>Keterangan Inggris</th>
+						<th>Pengalaman Kerja/Magang</th>
 						<th>Lembaga/Institusi</th>
 						<th>Tahun</th>
+						<th>Nomor Sertifikat</th>
 						<th>Bukti</th>
-						<th>Catatan</th>
 						<th>Status Verifikasi</th>
                         <th>Aksi</th>
 					</tr>
@@ -235,71 +240,75 @@
 				<tbody>
 					@foreach($mhs->magang ?? [] as $item)
 					<tr>
-						<td>{{ $item->keterangan_indonesia }}</td>
-						<td>{{ $item->keterangan_inggris }}</td>
-						<td>{{ $item->lembaga }}</td>
-						<td>{{ $item->tahun }}</td>
-						<td>@if($item->bukti)<a href="{{ asset('storage/'.$item->bukti) }}" target="_blank">Lihat</a>@endif</td>
-						<td>{{ $item->catatan }}</td>
-						<td>
+                        <td>{{ $item->keterangan_indonesia }}</td>
+                        <td>{{ $item->lembaga }}</td>
+                        <td>{{ $item->tahun }}</td>
+                        <td>{{ $item->nomor_sertifikat ?? '-' }}</td>
+                        <td>@if($item->bukti)<a href="{{ asset('storage/'.$item->bukti) }}" target="_blank">Lihat</a>@endif</td>
+                        <td>
                             @if($item->verifikasi === 1)
                                 <span class="badge bg-success">Diterima</span>
-                            @elseif($item->verifikasi === 0)
+                            @elseif($item->verifikasi === 2)
                                 <span class="badge bg-danger">Ditolak</span>
                             @else
                                 <span class="badge bg-secondary">Pending</span>
                             @endif
                         </td>
-						<td>
-                            @if($item->verifikasi === null || $item->verifikasi === 0)
+                        <td>
+                            @if($item->verifikasi === 1)
+                                <button onclick="verifikasiItem('{{ $item->id }}', 'magang', 2, this)" class="btn btn-danger btn-sm" title="Tolak"><i class="bi bi-x-circle"></i></button>
+                            @elseif($item->verifikasi === 2)
                                 <button onclick="verifikasiItem('{{ $item->id }}', 'magang', 1, this)" class="btn btn-success btn-sm" title="Terima"><i class="bi bi-check-circle"></i></button>
-                                <button onclick="verifikasiItem('{{ $item->id }}', 'magang', 0, this)" class="btn btn-danger btn-sm" title="Tolak"><i class="bi bi-x-circle"></i></button>
-                            @elseif($item->verifikasi === 1)
-                                <button onclick="verifikasiItem('{{ $item->id }}', 'magang', 0, this)" class="btn btn-danger btn-sm" title="Tolak"><i class="bi bi-x-circle"></i></button>
+                            @else
+                                <button onclick="verifikasiItem('{{ $item->id }}', 'magang', 1, this)" class="btn btn-success btn-sm" title="Terima"><i class="bi bi-check-circle"></i></button>
+                                <button onclick="verifikasiItem('{{ $item->id }}', 'magang', 2, this)" class="btn btn-danger btn-sm" title="Tolak"><i class="bi bi-x-circle"></i></button>
                             @endif
+                        </td>
 				        </td>
 					</tr>
 					@endforeach
 				</tbody>
 			</table>
 
-			<h5>Kompetensi Keagamaan</h5>
+			<h5>Kegiatan Lain-lain</h5>
 			<table class="table table-hover mb-3">
 				<thead>
 					<tr>
-						<th>Keterangan Indonesia</th>
-						<th>Keterangan Inggris</th>
+						<th>Nama Kegiatan</th>
+						<th>Penyelenggara</th>
 						<th>Tahun</th>
-						<th>Bukti</th>
-						<th>Catatan</th>
+						<th>Nomor Sertifikat</th>
+						<th>Bukti Sertifikat</th>
 						<th>Status Verifikasi</th>
                         <th>Aksi</th>
 					</tr>
 				</thead>
 				<tbody>
-					@foreach($mhs->kompetensiKeagamaan ?? [] as $item)
+					@foreach($mhs->lainLain ?? [] as $item)
 					<tr>
-						<td>{{ $item->keterangan_indonesia }}</td>
-						<td>{{ $item->keterangan_inggris }}</td>
-						<td>{{ $item->tahun }}</td>
+						<td>{{ $item->nama_kegiatan }}</td>
+						<td>{{ $item->penyelenggara ?? '-' }}</td>
+						<td>{{ $item->tahun ?? '-' }}</td>
+						<td>{{ $item->nomor_sertifikat ?? '-' }}</td>
 						<td>@if($item->bukti)<a href="{{ asset('storage/'.$item->bukti) }}" target="_blank">Lihat</a>@endif</td>
-						<td>{{ $item->catatan }}</td>
 						<td>
                             @if($item->verifikasi === 1)
                                 <span class="badge bg-success">Diterima</span>
-                            @elseif($item->verifikasi === 0)
+                            @elseif($item->verifikasi === 2)
                                 <span class="badge bg-danger">Ditolak</span>
                             @else
                                 <span class="badge bg-secondary">Pending</span>
                             @endif
                         </td>
 						<td>
-                            @if($item->verifikasi === null || $item->verifikasi === 0)
-                                <button onclick="verifikasiItem('{{ $item->id }}', 'keagamaan', 1, this)" class="btn btn-success btn-sm" title="Terima"><i class="bi bi-check-circle"></i></button>
-                                <button onclick="verifikasiItem('{{ $item->id }}', 'keagamaan', 0, this)" class="btn btn-danger btn-sm" title="Tolak"><i class="bi bi-x-circle"></i></button>
-                            @elseif($item->verifikasi === 1)
-                                <button onclick="verifikasiItem('{{ $item->id }}', 'keagamaan', 0, this)" class="btn btn-danger btn-sm" title="Tolak"><i class="bi bi-x-circle"></i></button>
-                            @endif
+                                    @if($item->verifikasi === 1)
+                                        <button onclick="verifikasiItem('{{ $item->id }}', 'lain-lain', 2, this)" class="btn btn-danger btn-sm" title="Tolak"><i class="bi bi-x-circle"></i></button>
+                                    @elseif($item->verifikasi === 2)
+                                        <button onclick="verifikasiItem('{{ $item->id }}', 'lain-lain', 1, this)" class="btn btn-success btn-sm" title="Terima"><i class="bi bi-check-circle"></i></button>
+                                    @else
+                                        <button onclick="verifikasiItem('{{ $item->id }}', 'lain-lain', 1, this)" class="btn btn-success btn-sm" title="Terima"><i class="bi bi-check-circle"></i></button>
+                                        <button onclick="verifikasiItem('{{ $item->id }}', 'lain-lain', 2, this)" class="btn btn-danger btn-sm" title="Tolak"><i class="bi bi-x-circle"></i></button>
+                                    @endif
 				        </td>
 					</tr>
 					@endforeach
@@ -314,6 +323,7 @@
 @push('scripts')
 <script>
 function verifikasiItem(id, type, status, button) {
+    console.log('verifikasiItem called:', {id, type, status});
     // Disable the buttons first
     const parentTd = button.closest('td');
     const buttons = parentTd.querySelectorAll('button');
@@ -332,21 +342,45 @@ function verifikasiItem(id, type, status, button) {
     })
     .then(response => response.json())
     .then(data => {
+        console.log('Response received:', data);
         if(data.success) {
             const statusTd = parentTd.previousElementSibling;
-            statusTd.innerHTML = status === 1 
-                ? '<span class="badge bg-success">Diterima</span>'
-                : '<span class="badge bg-danger">Ditolak</span>';
             
-            if (status === 1) {
-                // Keep only the reject button
-                parentTd.innerHTML = `<button onclick="verifikasiItem('${id}', '${type}', 0, this)" class="btn btn-danger btn-sm" title="Tolak"><i class="bi bi-x-circle"></i></button>`;
+            // Determine the correct status display based on table type
+            if (type === 'keahlian-tambahan' || type === 'lain-lain') {
+                // New tables: 0=pending, 1=accepted, 2=rejected
+                if (status === 1) {
+                    statusTd.innerHTML = '<span class="badge bg-success">Diterima</span>';
+                    parentTd.innerHTML = `<button onclick="verifikasiItem('${id}', '${type}', 2, this)" class="btn btn-danger btn-sm" title="Tolak"><i class="bi bi-x-circle"></i></button>`;
+                } else if (status === 2) {
+                    statusTd.innerHTML = '<span class="badge bg-danger">Ditolak</span>';
+                    parentTd.innerHTML = `
+                        <button onclick="verifikasiItem('${id}', '${type}', 1, this)" class="btn btn-success btn-sm" title="Terima"><i class="bi bi-check-circle"></i></button>
+                        <button onclick="verifikasiItem('${id}', '${type}', 2, this)" class="btn btn-danger btn-sm" title="Tolak"><i class="bi bi-x-circle"></i></button>
+                    `;
+                } else if (status === 0) {
+                    statusTd.innerHTML = '<span class="badge bg-secondary">Pending</span>';
+                    parentTd.innerHTML = `
+                        <button onclick="verifikasiItem('${id}', '${type}', 1, this)" class="btn btn-success btn-sm" title="Terima"><i class="bi bi-check-circle"></i></button>
+                        <button onclick="verifikasiItem('${id}', '${type}', 2, this)" class="btn btn-danger btn-sm" title="Tolak"><i class="bi bi-x-circle"></i></button>
+                    `;
+                }
             } else {
-                // Show both buttons when rejected
-                parentTd.innerHTML = `
-                    <button onclick="verifikasiItem('${id}', '${type}', 1, this)" class="btn btn-success btn-sm" title="Terima"><i class="bi bi-check-circle"></i></button>
-                    <button onclick="verifikasiItem('${id}', '${type}', 0, this)" class="btn btn-danger btn-sm" title="Tolak"><i class="bi bi-x-circle"></i></button>
-                `;
+                // Old tables: 0=rejected, 1=accepted
+                statusTd.innerHTML = status === 1 
+                    ? '<span class="badge bg-success">Diterima</span>'
+                    : '<span class="badge bg-danger">Ditolak</span>';
+                
+                if (status === 1) {
+                    // Keep only the reject button
+                    parentTd.innerHTML = `<button onclick="verifikasiItem('${id}', '${type}', 0, this)" class="btn btn-danger btn-sm" title="Tolak"><i class="bi bi-x-circle"></i></button>`;
+                } else {
+                    // Show both buttons when rejected
+                    parentTd.innerHTML = `
+                        <button onclick="verifikasiItem('${id}', '${type}', 1, this)" class="btn btn-success btn-sm" title="Terima"><i class="bi bi-check-circle"></i></button>
+                        <button onclick="verifikasiItem('${id}', '${type}', 0, this)" class="btn btn-danger btn-sm" title="Tolak"><i class="bi bi-x-circle"></i></button>
+                    `;
+                }
             }
         }
     })

@@ -11,6 +11,8 @@ use App\Models\PengalamanOrganisasi;
 use App\Models\KompetensiBahasa;
 use App\Models\PengalamanMagang;
 use App\Models\KompetensiKeagamaan;
+use App\Models\KeahlianTambahan;
+use App\Models\LainLain;
 use App\Models\BiodataMahasiswa;
 
 class FormSkpiController extends Controller
@@ -21,7 +23,9 @@ class FormSkpiController extends Controller
                 'organisasi',
                 'magang',
                 'kompetensiBahasa',
-                'kompetensiKeagamaan'
+                'kompetensiKeagamaan',
+                'keahlianTambahan',
+                'lainLain'
             ])
             ->where('user_id', Auth::id())
             ->get();
@@ -33,11 +37,13 @@ class FormSkpiController extends Controller
         {
             $request->validate([
                 'keterangan_indonesia' => 'required|string|max:255',
-                'keterangan_inggris' => 'required|string|max:255',
+                // english description optional in the form
+                'keterangan_inggris' => 'nullable|string|max:255',
                 'jenis_organisasi' => 'required|string|max:100',
                 'tahun' => 'required|integer|min:1900|max:2100',
-                'bukti' => 'nullable|file',
+                'bukti' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
                 'catatan' => 'nullable|string',
+                'nomor_sertifikat' => 'nullable|string|max:100',
             ]);
 
             $data = $request->only([
@@ -46,13 +52,22 @@ class FormSkpiController extends Controller
                 'jenis_organisasi',
                 'tahun',
                 'catatan',
+                'nomor_sertifikat',
             ]);
             $data['user_id'] = Auth::id();
-            $data['verifikasi'] = false;
+            // 0 = menunggu, 1 = diterima, 2 = ditolak (match KeahlianTambahan behavior)
+            $data['verifikasi'] = 0;
 
             if ($request->hasFile('bukti')) {
-                $data['bukti'] = $request->file('bukti')->store('bukti_penghargaan', 'public');
+                // store in same generic 'bukti' folder like KeahlianTambahan
+                $data['bukti'] = $request->file('bukti')->store('bukti', 'public');
             }
+
+            // ensure optional fields exist to avoid "no default value" DB errors
+            // DB currently doesn't accept NULL for keterangan_inggris, set empty string if omitted
+            $data['keterangan_inggris'] = $data['keterangan_inggris'] ?? '';
+            $data['catatan'] = $data['catatan'] ?? null;
+            $data['nomor_sertifikat'] = $data['nomor_sertifikat'] ?? null;
 
             PenghargaanPrestasi::create($data);
 
@@ -65,7 +80,7 @@ class FormSkpiController extends Controller
                 'organisasi' => 'required|string|max:255',
                 'tahun_awal' => 'required|integer|min:1900|max:2100',
                 'tahun_akhir' => 'required|integer|min:1900|max:2100',
-                'bukti' => 'nullable|file',
+                'bukti' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
                 'catatan' => 'nullable|string',
             ]);
 
@@ -74,13 +89,17 @@ class FormSkpiController extends Controller
                 'tahun_awal',
                 'tahun_akhir',
                 'catatan',
+                'nomor_sertifikat',
             ]);
             $data['user_id'] = Auth::id();
-            $data['verifikasi'] = false;
+            $data['verifikasi'] = 0;
 
             if ($request->hasFile('bukti')) {
-                $data['bukti'] = $request->file('bukti')->store('bukti_organisasi', 'public');
+                $data['bukti'] = $request->file('bukti')->store('bukti', 'public');
             }
+
+            $data['catatan'] = $data['catatan'] ?? null;
+            $data['nomor_sertifikat'] = $data['nomor_sertifikat'] ?? null;
 
             PengalamanOrganisasi::create($data);
 
@@ -93,7 +112,7 @@ class FormSkpiController extends Controller
                 'organisasi' => 'required|string|max:255',
                 'tahun_awal' => 'required|integer|min:1900|max:2100',
                 'tahun_akhir' => 'required|integer|min:1900|max:2100',
-                'bukti' => 'nullable|file',
+                'bukti' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
                 'catatan' => 'nullable|string',
             ]);
 
@@ -105,10 +124,11 @@ class FormSkpiController extends Controller
                 'tahun_awal',
                 'tahun_akhir',
                 'catatan',
+                'nomor_sertifikat',
             ]);
 
             if ($request->hasFile('bukti')) {
-                $data['bukti'] = $request->file('bukti')->store('bukti_organisasi', 'public');
+                $data['bukti'] = $request->file('bukti')->store('bukti', 'public');
             }
 
             $organisasi->update($data);
@@ -177,10 +197,10 @@ class FormSkpiController extends Controller
         {
             $request->validate([
                 'keterangan_indonesia' => 'required|string|max:255',
-                'keterangan_inggris' => 'required|string|max:255',
+                'keterangan_inggris' => 'nullable|string|max:255',
                 'lembaga' => 'required|string|max:255',
                 'tahun' => 'required|integer|min:1900|max:2100',
-                'bukti' => 'nullable|file',
+                'bukti' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
                 'catatan' => 'nullable|string',
             ]);
 
@@ -190,13 +210,18 @@ class FormSkpiController extends Controller
                 'lembaga',
                 'tahun',
                 'catatan',
+                'nomor_sertifikat',
             ]);
             $data['user_id'] = Auth::id();
-            $data['verifikasi'] = false;
+            $data['verifikasi'] = 0;
 
             if ($request->hasFile('bukti')) {
-                $data['bukti'] = $request->file('bukti')->store('bukti_magang', 'public');
+                $data['bukti'] = $request->file('bukti')->store('bukti', 'public');
             }
+
+            $data['keterangan_inggris'] = $data['keterangan_inggris'] ?? '';
+            $data['catatan'] = $data['catatan'] ?? null;
+            $data['nomor_sertifikat'] = $data['nomor_sertifikat'] ?? null;
 
             PengalamanMagang::create($data);
 
@@ -207,10 +232,10 @@ class FormSkpiController extends Controller
         {
             $request->validate([
                 'keterangan_indonesia' => 'required|string|max:255',
-                'keterangan_inggris' => 'required|string|max:255',
+                'keterangan_inggris' => 'nullable|string|max:255',
                 'lembaga' => 'required|string|max:255',
                 'tahun' => 'required|integer|min:1900|max:2100',
-                'bukti' => 'nullable|file',
+                'bukti' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
                 'catatan' => 'nullable|string',
             ]);
 
@@ -223,10 +248,11 @@ class FormSkpiController extends Controller
                 'lembaga',
                 'tahun',
                 'catatan',
+                'nomor_sertifikat',
             ]);
 
             if ($request->hasFile('bukti')) {
-                $data['bukti'] = $request->file('bukti')->store('bukti_magang', 'public');
+                $data['bukti'] = $request->file('bukti')->store('bukti', 'public');
             }
 
             $magang->update($data);
@@ -238,10 +264,12 @@ class FormSkpiController extends Controller
         {
             $request->validate([
                 'keterangan_indonesia' => 'required|string|max:255',
-                'keterangan_inggris' => 'required|string|max:255',
+                // english description optional
+                'keterangan_inggris' => 'nullable|string|max:255',
                 'tahun' => 'required|integer|min:1900|max:2100',
-                'bukti' => 'nullable|file',
+                'bukti' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
                 'catatan' => 'nullable|string',
+                'nomor_sertifikat' => 'nullable|string|max:100',
             ]);
 
             $data = $request->only([
@@ -249,13 +277,18 @@ class FormSkpiController extends Controller
                 'keterangan_inggris',
                 'tahun',
                 'catatan',
+                'nomor_sertifikat',
             ]);
             $data['user_id'] = Auth::id();
-            $data['verifikasi'] = false;
+            $data['verifikasi'] = 0;
 
             if ($request->hasFile('bukti')) {
-                $data['bukti'] = $request->file('bukti')->store('bukti_keagamaan', 'public');
+                $data['bukti'] = $request->file('bukti')->store('bukti', 'public');
             }
+
+            $data['keterangan_inggris'] = $data['keterangan_inggris'] ?? '';
+            $data['catatan'] = $data['catatan'] ?? null;
+            $data['nomor_sertifikat'] = $data['nomor_sertifikat'] ?? null;
 
             KompetensiKeagamaan::create($data);
 
@@ -268,7 +301,7 @@ class FormSkpiController extends Controller
                 'keterangan_indonesia' => 'required|string|max:255',
                 'keterangan_inggris' => 'required|string|max:255',
                 'tahun' => 'required|integer|min:1900|max:2100',
-                'bukti' => 'nullable|file',
+                'bukti' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
                 'catatan' => 'nullable|string',
             ]);
 
@@ -280,10 +313,11 @@ class FormSkpiController extends Controller
                 'keterangan_inggris',
                 'tahun',
                 'catatan',
+                'nomor_sertifikat',
             ]);
 
             if ($request->hasFile('bukti')) {
-                $data['bukti'] = $request->file('bukti')->store('bukti_keagamaan', 'public');
+                $data['bukti'] = $request->file('bukti')->store('bukti', 'public');
             }
 
             $keagamaan->update($data);
@@ -303,10 +337,10 @@ class FormSkpiController extends Controller
         {
             $request->validate([
                 'keterangan_indonesia' => 'required|string|max:255',
-                'keterangan_inggris' => 'required|string|max:255',
+                'keterangan_inggris' => 'nullable|string|max:255',
                 'jenis_organisasi' => 'required|string|max:100',
                 'tahun' => 'required|integer|min:1900|max:2100',
-                'bukti' => 'nullable|file',
+                'bukti' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
                 'catatan' => 'nullable|string',
             ]);
 
@@ -319,11 +353,16 @@ class FormSkpiController extends Controller
                 'jenis_organisasi',
                 'tahun',
                 'catatan',
+                'nomor_sertifikat',
             ]);
 
             if ($request->hasFile('bukti')) {
-                $data['bukti'] = $request->file('bukti')->store('bukti_penghargaan', 'public');
+                $data['bukti'] = $request->file('bukti')->store('bukti', 'public');
             }
+
+            $data['keterangan_inggris'] = $data['keterangan_inggris'] ?? null;
+            $data['catatan'] = $data['catatan'] ?? null;
+            $data['nomor_sertifikat'] = $data['nomor_sertifikat'] ?? null;
 
             $penghargaan->update($data);
 
@@ -337,5 +376,141 @@ class FormSkpiController extends Controller
                 ->firstOrFail();
             $penghargaan->delete();
             return redirect()->back()->with('success', 'Data penghargaan berhasil dihapus.');
+        }
+
+        // Keahlian Tambahan Methods
+        public function storeKeahlianTambahan(Request $request)
+        {
+            $request->validate([
+                'nama_keahlian' => 'required|string|max:150',
+                'lembaga' => 'nullable|string|max:150',
+                'tahun' => 'nullable|integer|min:1900|max:2100',
+                'nomor_sertifikat' => 'nullable|string|max:100',
+                'bukti' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            ]);
+
+            $data = $request->only([
+                'nama_keahlian',
+                'lembaga',
+                'tahun',
+                'nomor_sertifikat',
+            ]);
+            $data['user_id'] = Auth::id();
+            $data['verifikasi'] = 0;
+
+            if ($request->hasFile('bukti')) {
+                $data['bukti'] = $request->file('bukti')->store('bukti', 'public');
+            }
+
+            KeahlianTambahan::create($data);
+
+            return redirect()->back()->with('success', 'Data keahlian tambahan berhasil ditambahkan.');
+        }
+
+        public function updateKeahlianTambahan(Request $request, $id)
+        {
+            $request->validate([
+                'nama_keahlian' => 'required|string|max:150',
+                'lembaga' => 'nullable|string|max:150',
+                'tahun' => 'nullable|integer|min:1900|max:2100',
+                'nomor_sertifikat' => 'nullable|string|max:100',
+                'bukti' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            ]);
+
+            $keahlian = KeahlianTambahan::where('id', $id)
+                ->where('user_id', Auth::id())
+                ->firstOrFail();
+            
+            $data = $request->only([
+                'nama_keahlian',
+                'lembaga',
+                'tahun',
+                'nomor_sertifikat',
+            ]);
+
+            if ($request->hasFile('bukti')) {
+                $data['bukti'] = $request->file('bukti')->store('bukti', 'public');
+            }
+
+            $keahlian->update($data);
+
+            return redirect()->back()->with('success', 'Data keahlian tambahan berhasil diupdate.');
+        }
+
+        public function destroyKeahlianTambahan($id)
+        {
+            $keahlian = KeahlianTambahan::where('id', $id)
+                ->where('user_id', Auth::id())
+                ->firstOrFail();
+            $keahlian->delete();
+            return redirect()->back()->with('success', 'Data keahlian tambahan berhasil dihapus.');
+        }
+
+        // Lain Lain Methods
+        public function storeLainLain(Request $request)
+        {
+            $request->validate([
+                'nama_kegiatan' => 'required|string|max:150',
+                'penyelenggara' => 'nullable|string|max:150',
+                'tahun' => 'nullable|integer|min:1900|max:2100',
+                'nomor_sertifikat' => 'nullable|string|max:100',
+                'bukti' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            ]);
+
+            $data = $request->only([
+                'nama_kegiatan',
+                'penyelenggara',
+                'tahun',
+                'nomor_sertifikat',
+            ]);
+            $data['user_id'] = Auth::id();
+            $data['verifikasi'] = 0;
+
+            if ($request->hasFile('bukti')) {
+                $data['bukti'] = $request->file('bukti')->store('bukti', 'public');
+            }
+
+            LainLain::create($data);
+
+            return redirect()->back()->with('success', 'Data kegiatan lain berhasil ditambahkan.');
+        }
+
+        public function updateLainLain(Request $request, $id)
+        {
+            $request->validate([
+                'nama_kegiatan' => 'required|string|max:150',
+                'penyelenggara' => 'nullable|string|max:150',
+                'tahun' => 'nullable|integer|min:1900|max:2100',
+                'nomor_sertifikat' => 'nullable|string|max:100',
+                'bukti' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            ]);
+
+            $lainLain = LainLain::where('id', $id)
+                ->where('user_id', Auth::id())
+                ->firstOrFail();
+            
+            $data = $request->only([
+                'nama_kegiatan',
+                'penyelenggara',
+                'tahun',
+                'nomor_sertifikat',
+            ]);
+
+            if ($request->hasFile('bukti')) {
+                $data['bukti'] = $request->file('bukti')->store('bukti', 'public');
+            }
+
+            $lainLain->update($data);
+
+            return redirect()->back()->with('success', 'Data kegiatan lain berhasil diupdate.');
+        }
+
+        public function destroyLainLain($id)
+        {
+            $lainLain = LainLain::where('id', $id)
+                ->where('user_id', Auth::id())
+                ->firstOrFail();
+            $lainLain->delete();
+            return redirect()->back()->with('success', 'Data kegiatan lain berhasil dihapus.');
         }
 }

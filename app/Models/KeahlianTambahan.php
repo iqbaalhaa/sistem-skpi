@@ -5,22 +5,25 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class PengalamanMagang extends Model
+class KeahlianTambahan extends Model
 {
     use HasFactory;
-    protected $table = 'pengalaman_magang';
+
+    protected $table = 'keahlian_tambahan';
+
     protected $fillable = [
         'user_id',
-        'keterangan_indonesia',
-        'keterangan_inggris',
+        'nama_keahlian',
         'lembaga',
         'tahun',
-        'bukti',
-        'catatan',
-        'verifikasi',
         'nomor_sertifikat',
+        'bukti',
+        'verifikasi',
     ];
-    public function user() {
-        return $this->belongsTo(User::class);
+
+    // Relasi ke tabel users
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

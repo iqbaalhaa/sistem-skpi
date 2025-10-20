@@ -98,5 +98,16 @@ class User extends Authenticatable
     {
         return $this->hasOne(BiodataAdmin::class, 'user_id');
     }
+
+    public function keahlianTambahan()
+    {
+        return $this->hasMany(KeahlianTambahan::class, 'user_id');
+    }
+
+    public function lainLain()
+    {
+        return $this->hasMany(LainLain::class, 'user_id');
+    }
+
 }
 

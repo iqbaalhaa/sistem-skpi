@@ -100,7 +100,7 @@ Route::middleware(['auth', 'role:admin_prodi'])->group(function () {
         Log::info('Total mahasiswa (sebelum filter): ' . \App\Models\User::where('role', 'mahasiswa')->count());
 
         $mahasiswas = $mahasiswasQuery
-            ->with(['biodataMahasiswa', 'pengajuanSkpi', 'prestasi', 'organisasi', 'kompetensiBahasa', 'magang', 'kompetensiKeagamaan'])
+            ->with(['biodataMahasiswa', 'pengajuanSkpi', 'prestasi', 'organisasi', 'kompetensiBahasa', 'magang', 'kompetensiKeagamaan', 'keahlianTambahan', 'lainLain'])
             ->get();
         Log::info('Mahasiswa (setelah filter by prodi via users/biodata): ' . $mahasiswas->count());
             
@@ -151,6 +151,16 @@ Route::post('/mahasiswa/penghargaan/{id}/update', [FormSkpiController::class, 'u
 Route::delete('/mahasiswa/penghargaan/{id}', [FormSkpiController::class, 'destroyPenghargaan'])->name('penghargaan.destroy');
 Route::post('/mahasiswa/magang/{id}/update', [FormSkpiController::class, 'updateMagang'])->name('magang.update');
 Route::post('/mahasiswa/keagamaan/{id}/update', [FormSkpiController::class, 'updateKeagamaan'])->name('keagamaan.update');
+
+// Keahlian Tambahan routes
+Route::post('/mahasiswa/keahlian-tambahan', [FormSkpiController::class, 'storeKeahlianTambahan'])->name('keahlian-tambahan.store');
+Route::post('/mahasiswa/keahlian-tambahan/{id}/update', [FormSkpiController::class, 'updateKeahlianTambahan'])->name('keahlian-tambahan.update');
+Route::delete('/mahasiswa/keahlian-tambahan/{id}', [FormSkpiController::class, 'destroyKeahlianTambahan'])->name('keahlian-tambahan.destroy');
+
+// Lain Lain routes
+Route::post('/mahasiswa/lain-lain', [FormSkpiController::class, 'storeLainLain'])->name('lain-lain.store');
+Route::post('/mahasiswa/lain-lain/{id}/update', [FormSkpiController::class, 'updateLainLain'])->name('lain-lain.update');
+Route::delete('/mahasiswa/lain-lain/{id}', [FormSkpiController::class, 'destroyLainLain'])->name('lain-lain.destroy');
 
 Route::middleware(['auth', 'role:admin_prodi'])->group(function () {
     Route::get('/admin', [AdminBiodataController::class, 'index'])->name('admin.biodata');

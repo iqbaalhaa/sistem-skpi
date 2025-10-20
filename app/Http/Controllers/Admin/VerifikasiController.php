@@ -9,6 +9,8 @@ use App\Models\PengalamanOrganisasi;
 use App\Models\KompetensiBahasa;
 use App\Models\PengalamanMagang;
 use App\Models\KompetensiKeagamaan;
+use App\Models\KeahlianTambahan;
+use App\Models\LainLain;
 use App\Models\User;
 use App\Models\PengajuanSkpi;
 use Illuminate\Support\Facades\Log;
@@ -26,6 +28,8 @@ class VerifikasiController extends Controller
             'bahasa' => KompetensiBahasa::class,
             'magang' => PengalamanMagang::class,
             'keagamaan' => KompetensiKeagamaan::class,
+            'keahlian-tambahan' => KeahlianTambahan::class,
+            'lain-lain' => LainLain::class,
             default => null
         };
 
@@ -76,7 +80,7 @@ class VerifikasiController extends Controller
             ], 403);
         }
 
-        $mahasiswa = User::with(['prestasi', 'organisasi', 'kompetensiBahasa', 'magang', 'kompetensiKeagamaan'])
+        $mahasiswa = User::with(['prestasi', 'organisasi', 'kompetensiBahasa', 'magang', 'kompetensiKeagamaan', 'keahlianTambahan', 'lainLain'])
             ->where('role', 'mahasiswa')
             ->findOrFail($userId);
 
@@ -97,6 +101,8 @@ class VerifikasiController extends Controller
             $mahasiswa->kompetensiBahasa,
             $mahasiswa->magang,
             $mahasiswa->kompetensiKeagamaan,
+            $mahasiswa->keahlianTambahan,
+            $mahasiswa->lainLain,
         ];
 
         $hasAnySubmission = false;
@@ -106,6 +112,7 @@ class VerifikasiController extends Controller
             if ($collection && $collection->count() > 0) {
                 $hasAnySubmission = true;
                 // Semua item pada koleksi ini harus verifikasi === 1
+                // Untuk keahlian tambahan dan lain lain, verifikasi === 1 berarti diterima
                 if ($collection->where('verifikasi', '!=', 1)->count() > 0) {
                     $allApproved = false;
                     break;

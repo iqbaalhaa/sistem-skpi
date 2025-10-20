@@ -12,12 +12,26 @@ class BiodataMahasiswa extends Model
     protected $table = 'biodata_mahasiswa';
 
     protected $fillable = [
-        'user_id', 'nim', 'nama', 'prodi_id', 'tempat_lahir', 'tanggal_lahir', 'alamat', 'no_hp', 'foto'
+        'user_id',
+        'nim',
+        'nama',
+        'prodi_id',
+        'tempat_lahir',
+        'tanggal_lahir',
+        'alamat',
+        'no_hp',
+        'tahun_masuk',
+        'foto',
+        'tanggal_lulus',
+        'nomor_ijazah',
+        'ipk',
+        'judul_skripsi',
+        'lama_studi'
     ];
 
     public function prodi()
     {
-        return $this->belongsTo(\App\Models\Prodi::class, 'prodi_id');
+        return $this->belongsTo(\App\Models\Prodi::class, 'prodi_id', 'id');
     }
 
     public function user()
@@ -43,6 +57,14 @@ class BiodataMahasiswa extends Model
 
     public function kompetensiKeagamaan() {
         return $this->hasMany(KompetensiKeagamaan::class, 'user_id', 'user_id');
+    }
+
+    public function keahlianTambahan() {
+        return $this->hasMany(KeahlianTambahan::class, 'user_id', 'user_id');
+    }
+
+    public function lainLain() {
+        return $this->hasMany(LainLain::class, 'user_id', 'user_id');
     }
 
 }

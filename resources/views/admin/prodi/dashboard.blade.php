@@ -82,8 +82,6 @@
         background: #f8f9fa;
     }
 </style>
-
-<div class="container-fluid dashboard-container">
     <!-- Welcome Section -->
     <div class="row mb-4">
         <div class="col-12">
@@ -238,7 +236,7 @@
     </div>
 
     <!-- Recent Activities -->
-    <div class="row">
+    {{-- <div class="row">
         <div class="col-12">
             <div class="card border-0 shadow-sm card-hover">
                 <div class="card-header border-0">
@@ -316,8 +314,7 @@
                 </div>
             </div>
         </div>
-    </div>
-</div>
+    </div> --}}
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
