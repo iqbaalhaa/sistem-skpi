@@ -18,15 +18,26 @@
                                 Status SKPI: 
                                 @php
                                     $latestPengajuan = \App\Models\PengajuanSkpi::where('user_id', Auth::id())->latest('created_at')->first();
-                                    $status = $latestPengajuan->status ?? null;
-                                    $label = 'Dalam Proses';
-                                    $badge = 'bg-warning';
-                                    if ($status === 'diterima_prodi' || $status === 'diterima_fakultas') {
-                                        $label = 'Diterima';
-                                        $badge = 'bg-success';
-                                    } elseif ($status === 'ditolak_prodi' || $status === 'ditolak_fakultas') {
-                                        $label = 'Ditolak';
-                                        $badge = 'bg-danger';
+                                    if (!$latestPengajuan) {
+                                        // Belum pernah mengajukan
+                                        $label = '-';
+                                        $badge = 'bg-secondary';
+                                    } else {
+                                        $status = $latestPengajuan->status ?? null;
+                                        // treat 'menunggu' (or similar waiting states) as 'Dalam Proses'
+                                        if ($status === 'menunggu') {
+                                            $label = 'Dalam Proses';
+                                            $badge = 'bg-warning';
+                                        } elseif ($status === 'diterima_prodi' || $status === 'diterima_fakultas') {
+                                            $label = 'Diterima';
+                                            $badge = 'bg-success';
+                                        } elseif ($status === 'ditolak_prodi' || $status === 'ditolak_fakultas') {
+                                            $label = 'Ditolak';
+                                            $badge = 'bg-danger';
+                                        } else {
+                                            $label = ucfirst($status ?? '-');
+                                            $badge = 'bg-secondary';
+                                        }
                                     }
                                 @endphp
                                 <span class="badge {{ $badge }}">{{ $label }}</span>
@@ -212,41 +223,66 @@
                     <h5 class="mb-0">Kelengkapan SKPI</h5>
                 </div>
                 <div class="card-body">
+                    @php
+                        $biodata = Auth::user()->biodataMahasiswa;
+                        // Simple biodata completeness: count required fields filled
+                        $requiredBiodataFields = ['nama','nim','tempat_lahir','tanggal_lahir','tahun_masuk','tanggal_lulus','ipk','nama_prodi'];
+                        $filled = 0;
+                        if ($biodata) {
+                            foreach ($requiredBiodataFields as $f) {
+                                if (!empty($biodata->$f)) $filled++;
+                            }
+                        }
+                        $biodataPercent = round(($filled / count($requiredBiodataFields)) * 100);
+
+                        // Counts for other sections
+                        $countPrestasi = Auth::user()->prestasi()->count();
+                        $countOrganisasi = Auth::user()->organisasi()->count();
+                        $countBahasa = Auth::user()->kompetensiBahasa()->count();
+                        $countMagang = Auth::user()->magang()->count();
+
+                        // Map counts to a 0-100 scale with reasonable caps
+                        $prestasiPercent = min(100, $countPrestasi * 25); // each prestasi = 25% up to 100%
+                        $organisasiPercent = min(100, $countOrganisasi * 20); // each org = 20%
+                        $bahasaPercent = min(100, $countBahasa * 33); // each bahasa = 33%
+                        $magangPercent = min(100, $countMagang * 50); // each magang = 50%
+                    @endphp
+
                     <div class="progress-list">
                         <div class="mb-3">
                             <div class="d-flex justify-content-between align-items-center mb-1">
                                 <span>Biodata</span>
-                                <span>100%</span>
+                                <span>{{ $biodataPercent ?? 0 }}%</span>
                             </div>
                             <div class="progress" style="height: 8px;">
-                                <div class="progress-bar bg-success" role="progressbar" style="width: 100%"></div>
+                                <div class="progress-bar {{ $biodataPercent >= 80 ? 'bg-success' : ($biodataPercent >= 50 ? 'bg-warning' : 'bg-secondary') }}" role="progressbar" style="width: {{ $biodataPercent ?? 0 }}%"></div>
                             </div>
                         </div>
                         <div class="mb-3">
                             <div class="d-flex justify-content-between align-items-center mb-1">
                                 <span>Prestasi</span>
-                                <span>75%</span>
+                                <span>{{ $prestasiPercent }}%</span>
                             </div>
                             <div class="progress" style="height: 8px;">
-                                <div class="progress-bar bg-primary" role="progressbar" style="width: 75%"></div>
+                                <div class="progress-bar bg-primary" role="progressbar" style="width: {{ $prestasiPercent }}%"></div>
                             </div>
                         </div>
                         <div class="mb-3">
                             <div class="d-flex justify-content-between align-items-center mb-1">
                                 <span>Pengalaman Organisasi</span>
-                                <span>60%</span>
+                                <span>{{ $organisasiPercent }}%</span>
                             </div>
                             <div class="progress" style="height: 8px;">
-                                <div class="progress-bar bg-warning" role="progressbar" style="width: 60%"></div>
+                                <div class="progress-bar bg-warning" role="progressbar" style="width: {{ $organisasiPercent }}%"></div>
                             </div>
                         </div>
                         <div>
                             <div class="d-flex justify-content-between align-items-center mb-1">
                                 <span>Sertifikasi</span>
-                                <span>40%</span>
+                                <span>{{ $bahasaPercent }}%</span>
                             </div>
                             <div class="progress" style="height: 8px;">
-                                <div class="progress-bar bg-info" role="progressbar" style="width: 40%"></div>
+                                <div class="progress-bar bg-info" role="progressbar" style="width: {{ $bahasaPercent }}%"></div>
                             </div>
                         </div>
                     </div>

@@ -21,6 +21,7 @@ use App\Models\PengalamanOrganisasi;
 use App\Models\PengalamanMagang;
 use App\Models\KeahlianTambahan;
 use App\Models\LainLain;
+use App\Models\Prodi;
 
 class GenerateSkpiController extends Controller
 {
@@ -46,19 +47,24 @@ class GenerateSkpiController extends Controller
     {
         $adminProdiId = Auth::user()->prodi_id;
 
-        $user = User::with(['biodataMahasiswa', 'prodi'])
+        $user = User::with(['biodataMahasiswa'])
             ->where('role', 'mahasiswa')
             ->findOrFail($userId);
 
-        $userProdiId = optional($user->biodataMahasiswa)->prodi_id ?? $user->prodi_id;
+        $biodata = $user->biodataMahasiswa;
+        if (!$biodata) {
+            return back()->with('error', 'Biodata mahasiswa tidak ditemukan. Pastikan biodata mahasiswa sudah diisi.');
+        }
+
+        // Prefer prodi_id from biodata_mahasiswa. If still not present, try user's prodi relationship as fallback.
+        $userProdiId = $biodata->prodi_id ?? optional($user->prodi)->id ?? null;
         if ($userProdiId !== $adminProdiId) {
             abort(403, 'Anda tidak memiliki akses untuk mahasiswa prodi lain.');
         }
 
         // === Template path ===
+        // Prefer public/templates (user moved template there), then storage, then legacy paths
         $templatePaths = [
-            storage_path('app/templates/skpi_template.docx'),
-            public_path('storage/app/templates/skpi_template.docx'),
             public_path('templates/skpi_template.docx'),
         ];
 
@@ -75,7 +81,7 @@ class GenerateSkpiController extends Controller
             return back()->with('error', "Template SKPI tidak ditemukan. Telah dicari di:\n- " . $searchedPaths);
         }
 
-        $biodata = $user->biodataMahasiswa;
+    // $biodata already loaded earlier
         $processor = new TemplateProcessor($templatePath);
 
         // ==== FOTO MAHASISWA ====
@@ -102,10 +108,20 @@ class GenerateSkpiController extends Controller
         // ==== ISI DATA DASAR ====
         $processor->setValue('nama_lengkap', $biodata->nama ?? '-');
         $processor->setValue('nim', $biodata->nim ?? '-');
-        $processor->setValue('prodi', optional($user->prodi)->nama_prodi ?? '-');
-        $processor->setValue('akreditasi', optional($user->prodi)->akreditasi ?? '-');
-        $processor->setValue('jenjang_pendidikan', optional($user->prodi)->jenjang_pendidikan ?? '-');
-        $processor->setValue('gelar', optional($user->prodi)->gelar ?? '-');
+        // Resolve prodi info from biodata->prodi_id (preferred)
+        $prodi = null;
+        if (!empty($biodata->prodi_id)) {
+            $prodi = Prodi::find($biodata->prodi_id);
+        }
+        // Fallback to user's prodi relation if Prodi not found via biodata
+        if (!$prodi && method_exists($user, 'prodi')) {
+            $prodi = $user->prodi;
+        }
+
+        $processor->setValue('prodi', $biodata->nama_prodi ?? optional($prodi)->nama_prodi ?? '-');
+        $processor->setValue('akreditasi', optional($prodi)->akreditasi ?? '-');
+        $processor->setValue('jenjang_pendidikan', optional($prodi)->jenjang_pendidikan ?? '-');
+        $processor->setValue('gelar', optional($prodi)->gelar ?? '-');
         $processor->setValue('ttl', $biodata->tempat_lahir . ', ' . Carbon::parse($biodata->tanggal_lahir)->format('d-m-Y'));
         $processor->setValue('tahun_masuk', $biodata->tahun_masuk ?? '-');
         $processor->setValue('tanggal_lulus', $biodata->tanggal_lulus ?? '-');
