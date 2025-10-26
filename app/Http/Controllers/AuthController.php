@@ -116,6 +116,9 @@ class AuthController extends Controller
             Auth::login($user);
             Log::info('User logged in');
 
+            // Set flash message untuk ditampilkan di dashboard
+            session()->flash('registration_success', true);
+
             return redirect()->route('mahasiswa.dashboard');
         } catch (\Exception $e) {
             Log::error('Registration failed', [

@@ -402,10 +402,6 @@
                     <div class="modal-header">
                         <h5 class="modal-title" id="modalTambahOrganisasiLabel">Tambah Pengalaman Berorganisasi</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            <div class="mb-3">
-                                <label class="form-label">Nomor Sertifikat</label>
-                                <input type="text" name="nomor_sertifikat" class="form-control">
-                            </div>
                     </div>
                     <form action="{{ route('organisasi.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
@@ -421,6 +417,10 @@
                             <div class="mb-3">
                                 <label class="form-label">Tahun Akhir</label>
                                 <input type="number" name="tahun_akhir" class="form-control" min="1900" max="2100" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Nomor Sertifikat</label>
+                                <input type="text" name="nomor_sertifikat" class="form-control">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Bukti</label>

@@ -8,6 +8,7 @@ use App\Http\Controllers\Mahasiswa\FormSkpiController;
 use App\Http\Controllers\Admin\AdminBiodataController;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Admin\Fakultas\FakultasController;
+use App\Http\Controllers\Admin\Fakultas\LaporanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,6 +25,7 @@ use App\Http\Controllers\Admin\Fakultas\FakultasController;
 Route::get('/', function () {
     return view('home');
 });
+
 
 // Auth routes
 Route::prefix('auth')->group(function () {
@@ -137,6 +139,11 @@ Route::middleware(['auth', 'role:admin_prodi'])->group(function () {
         ->name('prodi.generateskpi.generate');
 });
 
+Route::get('/mahasiswa/skpi/cetak/{id}', [\App\Http\Controllers\Mahasiswa\SkpiController::class, 'cetak'])
+    ->name('mahasiswa.skpi.cetak')
+    ->middleware('auth');
+
+
 Route::get('/mahasiswa/skpi', [FormSkpiController::class, 'index'])->name('mahasiswa.skpi');
 
 Route::post('/mahasiswa/penghargaan', [FormSkpiController::class, 'storePenghargaan'])->name('penghargaan.store');
@@ -173,3 +180,12 @@ Route::middleware(['auth', 'role:admin_fakultas'])->group(function () {
     Route::get('/fakultas/prodi/{id}/mahasiswa', [FakultasController::class, 'getMahasiswaByProdi'])->name('fakultas.prodi.mahasiswa');
     Route::post('/fakultas/tandatangan/{id}', [FakultasController::class, 'tandaTangan'])->name('fakultas.tandatangan');
 });
+
+Route::prefix('admin/fakultas')
+    ->middleware(['auth', 'role:admin_fakultas'])
+    ->group(function () {
+        Route::get('/laporan', [LaporanController::class, 'index'])
+            ->name('admin.fakultas.laporan.index');
+        Route::get('/laporan/export', [LaporanController::class, 'export'])
+            ->name('admin.fakultas.laporan.export');
+    });

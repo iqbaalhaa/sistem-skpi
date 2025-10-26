@@ -55,14 +55,32 @@ class FakultasController extends Controller
                 return response()->json(['success' => false, 'message' => 'Hanya SKPI yang diterima prodi yang bisa ditandatangani.'], 422);
             }
 
+            // Generate nomor surat
+            $tahun = date('Y');
+            $bulan = date('m');
+            $lastNumber = \App\Models\SkpiCertificate::max('id') ?? 0;
+            $newNumber = $lastNumber + 1;
+            $nomorSurat = sprintf("B. %03d/VIII.I/PP.01.1/%s/%s", $newNumber, $bulan, $tahun);
+
+            // Simpan nomor surat ke dalam database
+            $certificate = \App\Models\SkpiCertificate::updateOrCreate(
+                ['user_id' => $skpi->user_id],
+                [
+                    'nomor_surat' => $nomorSurat,
+                    'generated_at' => now(),
+                    'file_path' => 'pending' // Memberikan nilai default string untuk file_path karena tidak boleh null
+                ]
+            );
+
+            // Update status pengajuan SKPI
             $skpi->status = 'diterima_fakultas';
             $skpi->tanggal_verifikasi_fakultas = now();
             $skpi->save();
 
-            return response()->json(['success' => true, 'message' => 'SKPI berhasil ditandatangani fakultas.']);
+            return response()->json(['success' => true, 'message' => 'SKPI berhasil ditandatangani fakultas dan nomor surat telah digenerate.']);
         } catch (\Exception $e) {
-            \Log::error('Error in tandaTangan method: ' . $e->getMessage());
-            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            \Illuminate\Support\Facades\Log::error('Error in tandaTangan method: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::error('Stack trace: ' . $e->getTraceAsString());
             
             return response()->json([
                 'success' => false, 

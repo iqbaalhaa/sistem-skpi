@@ -1,87 +1,48 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Mahasiswa;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Barryvdh\DomPDF\Facade\Pdf as PDF;
-use PhpOffice\PhpWord\IOFactory;
-use PhpOffice\PhpWord\TemplateProcessor;
-use PhpOffice\PhpWord\PhpWord;
-
-use Carbon\Carbon;
-use App\Models\BiodataMahasiswa;
+use App\Models\PengajuanSkpi;
 use App\Models\User;
+use App\Models\Prodi;
 use App\Models\SkpiCertificate;
 use App\Models\PenghargaanPrestasi;
 use App\Models\PengalamanOrganisasi;
 use App\Models\PengalamanMagang;
 use App\Models\KeahlianTambahan;
 use App\Models\LainLain;
-use App\Models\Prodi;
+use Carbon\Carbon;
+use PhpOffice\PhpWord\TemplateProcessor;
 
-class GenerateSkpiController extends Controller
+class SkpiController extends Controller
 {
-    public function index()
+    public function cetak($id)
     {
-        $adminProdiId = Auth::user()->prodi_id;
+        // Verify the SKPI belongs to the authenticated user
+        $pengajuan = PengajuanSkpi::where('user_id', Auth::id())
+            ->where('id', $id)
+            ->where('status', 'diterima_fakultas')
+            ->firstOrFail();
 
-        // Ambil mahasiswa berdasarkan biodata_mahasiswa.prodi_id (prioritas biodata),
-        // dan pastikan user berperan sebagai mahasiswa
-        $mahasiswa = BiodataMahasiswa::with(['user.pengajuanSkpi' => function($query) {
-                $query->latest('created_at');
-            }])
-            ->where('prodi_id', $adminProdiId)
-            ->whereHas('user', function ($q) {
-                $q->where('role', 'mahasiswa');
-            })
-            ->get();
-
-        return view('admin.prodi.generateskpi', compact('mahasiswa'));
-    }
-
-    public function generate(Request $request, int $userId)
-    {
-        $adminProdiId = Auth::user()->prodi_id;
-
-        $user = User::with(['biodataMahasiswa'])
-            ->where('role', 'mahasiswa')
-            ->findOrFail($userId);
-
+        // Get user data
+        $user = User::with('biodataMahasiswa')->findOrFail(Auth::id());
         $biodata = $user->biodataMahasiswa;
-        if (!$biodata) {
-            return back()->with('error', 'Biodata mahasiswa tidak ditemukan. Pastikan biodata mahasiswa sudah diisi.');
-        }
 
-        // Prefer prodi_id from biodata_mahasiswa. If still not present, try user's prodi relationship as fallback.
-        $userProdiId = $biodata->prodi_id ?? optional($user->prodi)->id ?? null;
-        if ($userProdiId !== $adminProdiId) {
-            abort(403, 'Anda tidak memiliki akses untuk mahasiswa prodi lain.');
+        if (!$biodata) {
+            return back()->with('error', 'Biodata tidak ditemukan.');
         }
 
         // === Template path ===
-        // Prefer public/templates (user moved template there), then storage, then legacy paths
-        $templatePaths = [
-            public_path('templates/skpi_template.docx'),
-        ];
-
-        $templatePath = null;
-        foreach ($templatePaths as $path) {
-            if (file_exists($path)) {
-                $templatePath = $path;
-                break;
-            }
+        $templatePath = public_path('templates/skpi_template.docx');
+        if (!file_exists($templatePath)) {
+            return back()->with('error', "Template SKPI tidak ditemukan di {$templatePath}");
         }
 
-        if (!$templatePath) {
-            $searchedPaths = implode("\n- ", $templatePaths);
-            return back()->with('error', "Template SKPI tidak ditemukan. Telah dicari di:\n- " . $searchedPaths);
-        }
-
-    // $biodata already loaded earlier
         $processor = new TemplateProcessor($templatePath);
 
         // ==== FOTO MAHASISWA ====
@@ -99,23 +60,19 @@ class GenerateSkpiController extends Controller
 
         // ==== PENOMORAN SURAT ====
         // Ambil nomor surat dari database yang sudah digenerate oleh admin fakultas
-        $certificate = SkpiCertificate::where('user_id', $userId)->first();
+        $certificate = SkpiCertificate::where('user_id', Auth::id())->first();
         $nomorSurat = $certificate ? $certificate->nomor_surat : '(Belum Digenerate)';
         $processor->setValue('nomor_surat', $nomorSurat);
 
-        // ==== ISI DATA DASAR ====
-        $processor->setValue('nama_lengkap', $biodata->nama ?? '-');
-        $processor->setValue('nim', $biodata->nim ?? '-');
-        // Resolve prodi info from biodata->prodi_id (preferred)
+        // Get Prodi data
         $prodi = null;
         if (!empty($biodata->prodi_id)) {
             $prodi = Prodi::find($biodata->prodi_id);
         }
-        // Fallback to user's prodi relation if Prodi not found via biodata
-        if (!$prodi && method_exists($user, 'prodi')) {
-            $prodi = $user->prodi;
-        }
 
+        // ==== ISI DATA DASAR ====
+        $processor->setValue('nama_lengkap', $biodata->nama ?? '-');
+        $processor->setValue('nim', $biodata->nim ?? '-');
         $processor->setValue('prodi', $biodata->nama_prodi ?? optional($prodi)->nama_prodi ?? '-');
         $processor->setValue('akreditasi', optional($prodi)->akreditasi ?? '-');
         $processor->setValue('jenjang_pendidikan', optional($prodi)->jenjang_pendidikan ?? '-');
@@ -131,11 +88,11 @@ class GenerateSkpiController extends Controller
 
         // ==== DATA TABEL ====
         $tables = [
-            'prestasi' => PenghargaanPrestasi::where('user_id', $user->id)->get(),
-            'organisasi' => PengalamanOrganisasi::where('user_id', $user->id)->get(),
-            'magang' => PengalamanMagang::where('user_id', $user->id)->get(),
-            'keahlian' => KeahlianTambahan::where('user_id', $user->id)->get(),
-            'lain' => LainLain::where('user_id', $user->id)->get(),
+            'prestasi' => PenghargaanPrestasi::where('user_id', Auth::id())->get(),
+            'organisasi' => PengalamanOrganisasi::where('user_id', Auth::id())->get(),
+            'magang' => PengalamanMagang::where('user_id', Auth::id())->get(),
+            'keahlian' => KeahlianTambahan::where('user_id', Auth::id())->get(),
+            'lain' => LainLain::where('user_id', Auth::id())->get(),
         ];
 
         $formatList = function ($data, $fieldNama, $fieldSertifikat) {
@@ -150,11 +107,11 @@ class GenerateSkpiController extends Controller
             return trim($text);
         };
 
-        $processor->setValue('prestasi', (string) $formatList($tables['prestasi'], 'keterangan_indonesia', 'nomor_sertifikat'));
-        $processor->setValue('organisasi', (string) $formatList($tables['organisasi'], 'organisasi', 'nomor_sertifikat'));
-        $processor->setValue('magang', (string) $formatList($tables['magang'], 'keterangan_indonesia', 'nomor_sertifikat'));
-        $processor->setValue('keahlian_tambahan', (string) $formatList($tables['keahlian'], 'nama_keahlian', 'nomor_sertifikat'));
-        $processor->setValue('lain_lain', (string) $formatList($tables['lain'], 'nama_kegiatan', 'nomor_sertifikat'));
+        $processor->setValue('prestasi', $formatList($tables['prestasi'], 'keterangan_indonesia', 'nomor_sertifikat'));
+        $processor->setValue('organisasi', $formatList($tables['organisasi'], 'organisasi', 'nomor_sertifikat'));
+        $processor->setValue('magang', $formatList($tables['magang'], 'keterangan_indonesia', 'nomor_sertifikat'));
+        $processor->setValue('keahlian_tambahan', $formatList($tables['keahlian'], 'nama_keahlian', 'nomor_sertifikat'));
+        $processor->setValue('lain_lain', $formatList($tables['lain'], 'nama_kegiatan', 'nomor_sertifikat'));
 
         // ==== Simpan file Word ====
         $outputDir = 'public/storage/skpi';
@@ -176,7 +133,7 @@ class GenerateSkpiController extends Controller
 
         // ==== Simpan metadata ====
         SkpiCertificate::create([
-            'user_id' => $user->id,
+            'user_id' => Auth::id(),
             'file_path' => 'storage/skpi/' . $filename,
             'generated_at' => now(),
             'nomor_surat' => $nomorSurat,
@@ -186,5 +143,3 @@ class GenerateSkpiController extends Controller
         return response()->download($savePath)->deleteFileAfterSend(false);
     }
 }
-
-

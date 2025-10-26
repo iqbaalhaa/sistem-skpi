@@ -15,6 +15,7 @@ class SkpiCertificate extends Model
         'user_id',
         'file_path',
         'generated_at',
+        'nomor_surat',
     ];
 
     protected $casts = [
@@ -26,5 +27,3 @@ class SkpiCertificate extends Model
         return $this->belongsTo(User::class);
     }
 }
-
-

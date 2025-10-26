@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\BiodataMahasiswa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class MahasiswaProdiController extends Controller
 {
@@ -23,11 +24,6 @@ class MahasiswaProdiController extends Controller
         return view('admin.prodi.kelolamahasiswa', [
             'mahasiswa' => $mahasiswa
         ]);
-    }
-
-    public function create()
-    {
-        return view('prodi.mahasiswa.create');
     }
 
     public function store(Request $request)
@@ -59,19 +55,7 @@ class MahasiswaProdiController extends Controller
 
         return redirect()->route('prodi.mahasiswa.index')->with('success', 'Data mahasiswa berhasil ditambahkan');
     }
-
-    public function edit($id)
-    {
-        $mahasiswa = BiodataMahasiswa::where('biodata_mahasiswa.id', $id)
-            ->join('users', 'biodata_mahasiswa.user_id', '=', 'users.id')
-            ->select('biodata_mahasiswa.*', 'users.username', 'users.email')
-            ->firstOrFail();
-
-        return view('prodi.mahasiswa.edit', [
-            'mahasiswa' => $mahasiswa
-        ]);
-    }
-
+    
     public function update(Request $request, $id)
     {
         $biodata = BiodataMahasiswa::findOrFail($id);
@@ -104,10 +88,92 @@ class MahasiswaProdiController extends Controller
     {
         $biodata = BiodataMahasiswa::findOrFail($id);
         $user = User::find($biodata->user_id);
+        $userId = $biodata->user_id;
 
+        // Hapus file foto profil jika ada
+        if ($biodata->foto && Storage::disk('public')->exists($biodata->foto)) {
+            Storage::disk('public')->delete($biodata->foto);
+        }
+
+        // Hapus data penghargaan prestasi dan file bukti
+        $penghargaan = \App\Models\PenghargaanPrestasi::where('user_id', $userId)->get();
+        foreach ($penghargaan as $item) {
+            if ($item->bukti && Storage::disk('public')->exists($item->bukti)) {
+                Storage::disk('public')->delete($item->bukti);
+            }
+            $item->delete();
+        }
+
+        // Hapus data pengalaman organisasi dan file bukti
+        $organisasi = \App\Models\PengalamanOrganisasi::where('user_id', $userId)->get();
+        foreach ($organisasi as $item) {
+            if ($item->bukti && Storage::disk('public')->exists($item->bukti)) {
+                Storage::disk('public')->delete($item->bukti);
+            }
+            $item->delete();
+        }
+
+        // Hapus data kompetensi bahasa dan file bukti
+        $bahasa = \App\Models\KompetensiBahasa::where('user_id', $userId)->get();
+        foreach ($bahasa as $item) {
+            if ($item->bukti && Storage::disk('public')->exists($item->bukti)) {
+                Storage::disk('public')->delete($item->bukti);
+            }
+            $item->delete();
+        }
+
+        // Hapus data pengalaman magang dan file bukti
+        $magang = \App\Models\PengalamanMagang::where('user_id', $userId)->get();
+        foreach ($magang as $item) {
+            if ($item->bukti && Storage::disk('public')->exists($item->bukti)) {
+                Storage::disk('public')->delete($item->bukti);
+            }
+            $item->delete();
+        }
+
+        // Hapus data kompetensi keagamaan dan file bukti
+        $keagamaan = \App\Models\KompetensiKeagamaan::where('user_id', $userId)->get();
+        foreach ($keagamaan as $item) {
+            if ($item->bukti && Storage::disk('public')->exists($item->bukti)) {
+                Storage::disk('public')->delete($item->bukti);
+            }
+            $item->delete();
+        }
+
+        // Hapus data keahlian tambahan dan file bukti
+        $keahlian = \App\Models\KeahlianTambahan::where('user_id', $userId)->get();
+        foreach ($keahlian as $item) {
+            if ($item->bukti && Storage::disk('public')->exists($item->bukti)) {
+                Storage::disk('public')->delete($item->bukti);
+            }
+            $item->delete();
+        }
+
+        // Hapus data lain-lain dan file bukti
+        $lainlain = \App\Models\LainLain::where('user_id', $userId)->get();
+        foreach ($lainlain as $item) {
+            if ($item->bukti && Storage::disk('public')->exists($item->bukti)) {
+                Storage::disk('public')->delete($item->bukti);
+            }
+            $item->delete();
+        }
+
+        // Hapus data pengajuan SKPI
+        \App\Models\PengajuanSkpi::where('user_id', $userId)->delete();
+
+        // Hapus sertifikat SKPI dan file
+        $sertifikat = \App\Models\SkpiCertificate::where('user_id', $userId)->first();
+        if ($sertifikat) {
+            if ($sertifikat->file_path && Storage::disk('public')->exists($sertifikat->file_path)) {
+                Storage::disk('public')->delete($sertifikat->file_path);
+            }
+            $sertifikat->delete();
+        }
+
+        // Hapus biodata dan user
         $biodata->delete();
         $user->delete();
 
-        return redirect()->route('prodi.mahasiswa.index')->with('success', 'Data mahasiswa berhasil dihapus');
+        return redirect()->route('prodi.mahasiswa.index')->with('success', 'Data mahasiswa dan semua data terkait berhasil dihapus');
     }
 }

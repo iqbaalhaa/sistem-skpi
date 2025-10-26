@@ -51,7 +51,7 @@
                 <ul>
                     <li><a href="{{ url('/') }}" class="active">Home</a></li>
                     <li><a href="#get-started">Tentang</a></li>
-                    <li><a href="#">Panduan</a></li>
+                    <li><a href="#panduan">Panduan</a></li>
                     <li><a href="#footer">Hubungi Kami</a></li>
                 </ul>
             </nav><!-- .navbar -->
@@ -173,6 +173,49 @@
 
             </div>
         </section><!-- End Get Started Section -->
+
+        <!-- ======= Panduan Section ======= -->
+        <section id="panduan" class="section-bg py-5">
+            <div class="container" data-aos="fade-up">
+                <div class="section-header text-center">
+                    <h2>Panduan Penggunaan Sistem</h2>
+                    <p>Berikut panduan lengkap dalam bentuk video dan file PDF yang dapat membantu Anda menggunakan sistem SKPI dengan mudah.</p>
+                </div>
+
+                <div class="row gy-4 justify-content-center">
+                    <!-- Panduan Video -->
+                    <div class="col-lg-6">
+                        <div class="card shadow-sm p-3 h-100">
+                            <h5 class="text-center mb-3"><i class="bi bi-play-circle"></i> Panduan Video</h5>
+                            <div class="ratio ratio-16x9">
+                                <iframe 
+                                    src="https://www.youtube.com/embed/RvisA4DJ4Qo"
+                                    title="Panduan Video SKPI"
+                                    allowfullscreen>
+                                </iframe>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Panduan PDF -->
+                    <div class="col-lg-6">
+                        <div class="card shadow-sm p-3 h-100 text-center">
+                            <h5 class="mb-3"><i class="bi bi-file-earmark-pdf"></i> Panduan PDF</h5>
+                            <iframe 
+                                src="https://drive.google.com/file/d/1bVL7AI_V_AUlW-qc5sBD13XXZYjKwTfT/preview"
+                                width="100%" 
+                                height="350">
+                            </iframe>
+                            <a href="https://drive.google.com/file/d/1bVL7AI_V_AUlW-qc5sBD13XXZYjKwTfT/view?usp=share_link"
+                            class="btn btn-primary mt-3" target="_blank">
+                            Download PDF
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section><!-- End Panduan Section -->
+
     </main><!-- End #main -->
 
     <!-- ======= Footer ======= -->

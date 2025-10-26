@@ -3,6 +3,23 @@
 @section('title', 'Dashboard Mahasiswa')
 
 @section('content')
+@if(session('registration_success'))
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        Swal.fire({
+            title: 'Selamat Datang!',
+            text: 'Silahkan lengkapi biodata terlebih dahulu',
+            icon: 'info',
+            confirmButtonText: 'Oke',
+            confirmButtonColor: '#3085d6'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "{{ route('mahasiswa.biodata') }}";
+            }
+        });
+    });
+</script>
+@endif
 <div class="container-fluid">
     <!-- Welcome Section -->
     <div class="row">
@@ -48,14 +65,39 @@
                                 $latestPengajuan = \App\Models\PengajuanSkpi::where('user_id', Auth::id())
                                     ->latest('created_at')
                                     ->first();
+                                
+                                // Check if SKPI is ready to print
                                 $status = $latestPengajuan->status ?? null;
-                                $isSiapCetak = $status === 'diterima_fakultas';
+                                $isSiapCetak = false;
+                                $buttonTitle = 'Belum dapat dicetak';
+                                $buttonIcon = 'bi-hourglass-split';
+                                $buttonClass = 'btn-secondary disabled';
+
+                                if (!$latestPengajuan) {
+                                    $buttonTitle = 'Anda belum mengajukan SKPI';
+                                } elseif ($status === 'diterima_fakultas') {
+                                    $isSiapCetak = true;
+                                    $buttonTitle = 'Cetak SKPI Anda dalam format Word';
+                                    $buttonIcon = 'bi-printer-fill';
+                                    $buttonClass = 'btn-success';
+                                } elseif ($status === 'menunggu') {
+                                    $buttonTitle = 'Menunggu verifikasi prodi';
+                                    $buttonClass = 'btn-warning disabled';
+                                } elseif ($status === 'diterima_prodi') {
+                                    $buttonTitle = 'Menunggu verifikasi fakultas';
+                                    $buttonClass = 'btn-warning disabled';
+                                } elseif ($status === 'ditolak_prodi' || $status === 'ditolak_fakultas') {
+                                    $buttonTitle = 'SKPI ditolak - silakan ajukan ulang';
+                                    $buttonClass = 'btn-danger disabled';
+                                    $buttonIcon = 'bi-x-circle';
+                                }
                             @endphp
 
-                            <a href="#"
-                            class="btn btn-warning {{ $isSiapCetak ? '' : 'disabled' }}"
-                            title="{{ $isSiapCetak ? 'Cetak SKPI Anda' : 'Belum dapat dicetak (menunggu tanda tangan fakultas)' }}">
-                                <i class="bi bi-printer-fill"> Print SKPI Saya </i>
+                            <a href="{{ $isSiapCetak ? route('mahasiswa.skpi.cetak', ['id' => $latestPengajuan->id]) : '#' }}"
+                               class="btn {{ $buttonClass }}"
+                               onclick="{{ $isSiapCetak ? 'return confirm(\'Apakah Anda yakin ingin mencetak SKPI?\')' : 'return false' }}"
+                               title="{{ $buttonTitle }}">
+                                <i class="bi {{ $buttonIcon }}"></i> Print SKPI Saya
                             </a>
                         </div>
                     </div>

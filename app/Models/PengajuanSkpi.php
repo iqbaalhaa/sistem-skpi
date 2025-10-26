@@ -23,4 +23,10 @@ class PengajuanSkpi extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function certificate()
+    {
+        return $this->hasOne(\App\Models\SkpiCertificate::class, 'user_id', 'user_id');
+    }
+
 }

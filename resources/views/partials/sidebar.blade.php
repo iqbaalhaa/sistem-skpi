@@ -126,12 +126,12 @@
                                 <span>Manajemen Admin</span>
                             </a>
                         </li>
-                        <!-- <li class="sidebar-item">
-                            <a href="#" class="sidebar-link">
+                        <li class="sidebar-item">
+                            <a href="{{ route('admin.fakultas.laporan.index') }}" class="sidebar-link">
                                 <i class="bi bi-graph-up"></i>
                                 <span>Laporan</span>
                             </a>
-                        </li> -->
+                        </li>
                     @endif
                 @endif
             </ul>
